@@ -1,0 +1,117 @@
+/* Basic reset and font setup */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    background-color: #f9f9f9;
+    color: #333;
+}
+
+/* Header styles */
+header {
+    background-color: #2c3e50; /* Dark blue background */
+    color: #fff;
+    padding: 1rem 0;
+    text-align: center;
+}
+
+header h1 {
+    margin-bottom: 0.5rem;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+}
+
+nav ul li {
+    margin: 0 1rem;
+}
+
+nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 0.5rem 1rem;
+    transition: background-color 0.3s ease;
+}
+
+nav ul li a:hover {
+    background-color: #34495e; /* Slightly darker blue on hover */
+    border-radius: 5px;
+}
+
+/* Main content styles */
+main {
+    padding: 2rem;
+    max-width: 800px;
+    margin: 2rem auto;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+section {
+    margin-bottom: 2rem;
+}
+
+section h2 {
+    margin-bottom: 1rem;
+    color: #2c3e50; /* Dark blue color for section titles */
+    border-bottom: 2px solid #2c3e50; /* Border bottom for section titles */
+    padding-bottom: 0.5rem;
+}
+
+.article-list {
+    list-style: none;
+    padding: 0;
+}
+
+.article-list li {
+    margin-bottom: 1.5rem;
+}
+
+.article-list a {
+    text-decoration: none;
+    color: #2980b9; /* Blue links */
+    font-size: 1.2rem;
+    transition: color 0.3s ease;
+}
+
+.article-list a:hover {
+    text-decoration: underline;
+    color: #1c598a; /* Darker blue on hover */
+}
+
+.article-list p {
+    margin-top: 0.5rem;
+    color: #666;
+}
+
+/* CV styles */
+#cv p, #cv ul {
+    margin-bottom: 1rem;
+}
+
+#cv ul {
+    padding-left: 1.5rem;
+    list-style-type: disc;
+}
+
+/* Footer styles */
+footer {
+    background-color: #2c3e50; /* Dark blue background */
+    color: #fff;
+    text-align: center;
+    padding: 1rem 0;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    border-top: 2px solid #34495e; /* Border top for footer */
+}
