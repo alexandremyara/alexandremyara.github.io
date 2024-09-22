@@ -146,4 +146,18 @@ Manual downloading would take longer, given the need to organize the metadata. T
 The biggest strength of this method is the use of synthetic data.
 Typically, data annotation involves paying *crowd workers* for the more mechanical tasks.
 
-In our application, generating question/answer pairs is less mechanical and requires
+Based on platforms like Amazon Mechanical Turk or Appen, we can estimate human annotation at a minimum of $0.50.
+Thus, for 10 presentations with 20 slides, the cost is around $100.
+In comparison, the synthetic annotation of 10 presentations with 20 slides using the Claude 3.5 Sonnet API costs us $0.50.
+
+**For 200 pairs of synthetic questions/answers, the Gemini API takes 4 minutes**, which is, in all likelihood, faster than human annotation.
+
+## <span style="color:#337EA9">Conclusion and Scaling</span>
+We have successfully generated a dataset for a specific application of Document Visual Question Answering and Visual Information Retrieval using synthetic data.
+
+In addition to time savings due to automation, we also note the financial cost, which favors synthetic data. To assess the performance of the approach, we ultimately generated a dataset of 3,000 slides. The quality of synthetic data allowed us to retain 77% of the generated question/answer pairs after filtering based on the length of the returned response.
+
+This protocol enables the construction of a larger dataset if the data retrieval and synthetic generation times are increased.
+
+This dataset, which closely mirrors real-world applications, will optimize the evaluation of our models.
+
