@@ -1,7 +1,0 @@
-__pycache__/
-*.pyc
-.env
-venv/
-gitenv/
-resnet_x_ray/*.pt
-resnet_x_ray/COVID*
