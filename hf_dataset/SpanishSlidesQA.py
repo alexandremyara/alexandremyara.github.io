@@ -77,7 +77,7 @@ class frenchSlideVQA(datasets.GeneratorBasedBuilder) :
                             "questions/answers": qas
                             }
             else :
-                yield idx, {"id": meta_data["id"],
+                yield idx, {"id": int(meta_data["id"]),
                             "presentation_url": meta_data["presentation_url"],
                             "images": img_names,
                             "questions/answers": qas
