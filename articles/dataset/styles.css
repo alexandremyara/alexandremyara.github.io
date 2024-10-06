@@ -1,0 +1,36 @@
+body{
+    width:auto;
+    height:auto;
+    font-family: "Segoe UI";
+    overflow-x: hidden;
+}
+
+img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+section {
+    margin-left:20%;
+    margin-right:20%;
+
+}
+
+h1 {
+    /*color:#D9730D;
+    text-align: center;*/
+    font-size: 30px;
+}
+h2 {
+    color:#337EA9;
+}
+h3 {
+    color:#448361;
+}
+
+a {
+    text-decoration: none;
+    color:#337EA9;
+}

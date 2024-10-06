@@ -1,0 +1,233 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to consruct multimodal dataset efficiently ?</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<section id="dataset-imp"><h1>The Importance of the Dataset </h1>
+<p>
+
+<br><br><img alt="alt text" src="image/image-3.png"><br>
+
+<br><br>When tackling a deep learning problem, it's common to instinctively modify an existing architecture to fit the task or even consider designing a new one from scratch.
+
+<br><br>As highlighted in <a href="https://nonint.com/2023/06/10/the-it-in-ai-models-is-the-dataset/">The 'it' in AI models is the dataset</a>, the most significant lever to improve deep learning models relies in the training data rather than the architecture itself. Having data that is well-suited to a precise use case can significantly improve performance of the model for this use case.
+
+<br><br>Thus, the first question to ask is "What will be my model's application cases?".
+
+<br><br>For example, in <i>Natural Language Processing</i> (NLP), it is essential to identify the languages used. As we can see from <a href="https://huggingface.co/spaces/mteb/leaderboard">these metrics</a>, models trained in English are not necessarily the most effective in other languages. This is an example of domain adaptation as described in <a href="https://www.statlect.com/machine-learning/domain-shift">this article</a>.
+
+<br><br><b>Evaluating the performance of a model trained in English for an other language application will often yield poorer results than if the training had been done directly in this other language.</b>
+
+<br><br>Furthermore, having high-quality data from the same domain as your application can be beneficial for specializing the model using fine-tuning or LoRA.
+
+<br><br>Based on this observation, it is recommended to start solving a problem by clearly defining the application cases in order to <u>build your own dataset.</u>
+
+<br><br></p></section>
+<section id="build-dataset"><h3>Isn’t building your own dataset too time-consuming? </h3>
+<p>
+Indeed, creating a dataset can be tedious, time-consuming, and costly. Data often needs to be manually annotated, for example. 
+To address the annotation challenge, there is a solution: <b>synthetic data.</b>
+
+<br><br><u>The idea is to use external models that automatically generate data or labels.</u>
+
+<br><br>By combining tools provided by Python (or your preferred programming language) with those from pre-existing model APIs, it’s possible to automate dataset creation for a wide range of tasks.
+
+<br><br></p></section>
+<section id="article-goal"><h3>Goal of this article</h3>
+<p>
+We present here a pipeline to generate multimodal dataset. The main goal of this pipeline is to work without human annotation.
+
+<br><br>To illustrate this pipeline, this article proposes automating the creation of a dataset for Visual Information Retrieval and Document Visual Question Answering (DocVQA) for slides in an other language than English.
+It could be French or whatever, for this example one will use Spanish.
+
+<br><br></p></section>
+<section id="summary-sec"><h3>Summary</h3>
+<p>
+We aim to create a dataset on a specific use case, with the help of synthetic data. The main goal is to make it with an automtic protocol. Thus it will be possible, with enough resources, to create a dataset with a size as wanted.
+
+<br><br>1. Tasks definition : what is Visual Information Retrieval and DocVQA ?
+2. Dataset Construction : what is the structure of our dataset example.
+3. Code : How to construct our dataset.
+4. Performances : comparison of this method with human annotation
+
+<br><br>
+</p></section>
+<section id="taskDef"><h2>1. Task Definition </h2>
+<p>
+Before describing the pipeline in detail, let’s precisely define our use case to select the most appropriate data.
+We aim to build a dataset of slides in Spanish to train and evaluate models for Document Visual Question Answering and Visual Information Retrieval.
+
+<br><br></p></section>
+<section id="docvqa"><h3>Document Visual Question Answering (DocVQA)</h3>
+<p>
+Document Visual Question Answering is the task of answering a question based on a visual document (pdf, slide, etc.).
+
+<br><br>We input an image and a question, and the output is an answer. Thus, our dataset must include slide images as well as a question/answer feature.
+
+<br><br></p></section>
+<section id="vis-info-ret"><h3>Visual Information Retrieval</h3>
+<p>
+Visual Information Retrieval is the task of identifying, from a large set of documents and a question, which documents can answer the question.
+
+<br><br></p></section>
+<section id="dataset-build"><h2>2. Dataset Construction </h2>
+<p>
+To build a suitable dataset, we propose the following pipeline:
+1. Selecting a source of Spanish slides and retrieving raw data.
+2. Generating questions/answers using the API of a text/image model (Gemini, Claude, ChatGPT, etc.).
+3. Organizing the collected and synthesized data into a shareable format.
+4. Filtering the data to remove low-quality samples.
+
+<br><br><b>We use a copyright-free presentation slide website like Slideshare.net as our data source.</b> It’s possible to select the language used in the presentations, making it a perfect fit for our problem.
+
+<br><br></p></section>
+<section id="synthData"><h3>Synthetic Data Challenges</h3>
+<p>
+The automation of this process is made possible by combining two elements: automatic data collection via scraping methods and automatic data generation through a VLM.
+These synthetic data are an asset for building your dataset, as they offer:
+1. Time savings: The model API generates questions/answers automatically.
+2. Financial savings: No need for human annotation of the data.
+
+<br><br>This challenge is highlighted in the paper <a href="https://arxiv.org/pdf/2303.15056">ChatGPT outperforms crowd-workers for text-annotation tasks</a>.
+
+<br><br></p></section>
+<section id="datasetOrg"><h3>Dataset Organization</h3>
+<p>
+A presentation consists of one or more slides. After analyzing the available data for each slide presentation, we profile our dataset to include the following features:
+
+<br><br>| Feature                 | Description  |
+|------------|------------|
+|<b>id</b>|      unique identifier for the presentation      |
+| <b>presentation_url</b>    |      URL of the presentation on slideshare.net      |
+|<b>title</b>    |     presentation title       |
+| <b>author</b>   |       slideshare.net username of the author     |
+|<b>date</b>    |    date in YYYY-MM-DD format        |
+| <b>len</b> |       number of slides in the presentation     |
+| <b>description</b>    |      presentation description      |
+| <b>lang</b>   |    language specified by the author        |
+| <b>dim</b>    |      slide dimensions (HxW)      |
+| <b>likes</b>  |      number of likes on the presentation      |
+| <b>transcript</b>   |      list of slide text transcripts      |
+| <b>mostRead</b> |      True for the most-read slides, False for others.      |
+| <b>images</b>    |        list of all slide images in the presentation     |
+| <b>questions/answers</b>   |     list of dictionaries containing question/answer pairs for each slide |
+
+<br><br>This list contains question/answer pairs for each slide (one slide may have multiple question/answer pairs).
+
+<br><br></p></section>
+<section id="h3-section"><h2>3. Code </h2>
+<p>
+For the example, we will collect and annotate a hundred documents, but the code can easily be scaled up to handle thousands of documents by letting it run longer.
+
+<br><br>We use 3 Python notebooks and a Python script available at the following link <a href="https://github.com/alexandremyara/deep_learning/tree/main/hf_dataset">github/alexandremyara/deep_learning</a>. The code is organized as follows:
+1. `scrap.ipynb`: This notebook retrieves the download links for the different presentations and then downloads each slide one by one.
+2. `generate_qa.ipynb`: This notebook generates one or more question/answer pairs for each downloaded slide.
+3. `filter.ipynb`: This notebook loads the dataset and removes question/answer pairs that are too short or presentations with too few slides.
+
+<br><br>Finally, `dataset.py` generates the dataset in HuggingFace’s dataset format.
+
+<br><br></p></section>
+<section id="scraping-section"><h3>Scraping</h3>
+<p>
+Using a Python module, we make requests to the presentation site. We retrieve URLs for various presentations containing the keyword <i>"Spanish"</i>.
+
+<br><br>Once these URLs are collected, the slides are downloaded.
+Each slide presentation is stored in a folder that contains all the slides for that presentation.
+
+<br><br>We also save a `.json` file containing the presentation metadata (title, author, ID, etc.).
+
+<br><br><img alt="alt text" src="image/image.png"><br>
+Folders contain slides and metadata for each presentation 
+
+<br><br><img alt="alt text" src="image/image-1.png"><br>
+Folders contain slides and metadata for each presentation
+
+<br><br></p></section>
+<section id="qa-gen"><h3>Question/Answer Generation</h3>
+<p>
+Now we generate the synthetic data, specifically the question/answer pairs for each slide.
+To do this, we select a VLM with an API offering free access.
+
+<br><br>For example, we could use the Claude or Gemini API.
+
+<br><br>Once the model is chosen, we input the slides along with a prompt, such as:
+
+<br><br>``prompt = "Generate a question-answer pair in the format {question:, answer:}. The question should be based on the slide and be instructive, using visual elements to form the question and answer."``
+
+<br><br><img alt="alt" src="prompt.png"><br>
+
+<br><br>To meet the needs of <i>Visual Information Retrieval</i>, the generated questions/answers (synthetic data) must focus on specific or unique elements of the slide.
+
+<br><br>We verify that each question/answer pair clearly identifies the corresponding slide.
+
+<br><br>For each presentation, we store the list of question/answer pairs in `.json` format in the folder associated with the presentation.
+
+<br><br></p></section>
+<section id="dataset-fmt"><h3>Dataset Format</h3>
+<p>
+Once the data is collected, we generate the dataset in Dataset format and save in a parquet file.
+To do this, we use a script with Python Generator to generate a HuggingFace dataset.
+The dataset example is available at <a href="https://huggingface.co/datasets/AlexMyara/SpanishSlidesQA"></a>.
+
+<br><br>The dataset can then be loaded using HuggingFace’s `load_dataset` function and used for model evaluation, for example.
+
+<br><br></p></section>
+<section id="data-filter"><h3>Data Filtering</h3>
+<p>
+To improve data quality, it may be necessary to check the relevance of the synthetic data.
+We manually review a few question/answer pairs and check their consistency with the corresponding slide.
+
+<br><br>Next, we exclude any presentations that:
+1. Have a question or answer with fewer than 10 characters.
+2. Have fewer than 3 slides.
+
+<br><br>At this point, our dataset is of higher quality.
+
+<br><br></p></section>
+<section id="perf4"><h2>4. Performance </h2>
+<p>
+Let’s discuss the performance of this approach and the relevance of using synthetic data.
+
+<br><br></p></section>
+<section id="scrap-time"><h3>Scraping Time</h3>
+<p>
+Slides were retrieved using HTTP requests. With Python, it’s possible to retrieve 10 presentations with 20 slides each, along with their metadata in `.json` format, in <b>12 minutes</b>. This time includes pauses to avoid overwhelming the site with requests.
+<img alt="" src="image/scraping_time.png"><br>
+Manual downloading would take longer, given the need to organize the metadata. Thus, this approach offers the first time-saving advantage.
+
+<br><br></p></section>
+<section id="qa-time"><h3>Q/A Generation Time</h3>
+<p>
+The biggest strength of this method is the use of synthetic data.
+Typically, data annotation involves paying <i>crowd workers</i> for the more mechanical tasks.
+
+<br><br>Based on platforms like Amazon Mechanical Turk or Appen, we can estimate human annotation at a minimum of \$0.50.
+
+<br><br>Thus, for 10 presentations with 20 slides, the cost is around $100.
+In comparison, the synthetic annotation of 10 presentations with 20 slides using the Claude 3.5 Sonnet API costs us \$0.50.
+
+<br><br><b>For 200 pairs of synthetic questions/answers, the Gemini API takes 4 minutes</b>, which is, in all likelihood, faster than human annotation.
+<img alt="" src="image/generation_rate.png"><br>
+<img alt="" src="image/generation_cost.png"><br>
+
+<br><br></p></section>
+<h2>Conclusion and Scaling </h2>
+<p>
+We have successfully generated a dataset for a specific application of Document Visual Question Answering and Visual Information Retrieval using synthetic data.
+
+<br><br>Here a summary of performances.
+
+<br><br><img alt="" src="image/performances.png"><br>
+
+<br><br>In addition to time savings due to automation, we also note the financial cost, which favors synthetic data. To assess the performance of the approach, we ultimately generated a dataset of 3,000 slides. The quality of synthetic data allowed us to retain 77% of the generated question/answer pairs after filtering based on the length of the returned response.
+
+<br><br>This protocol enables the construction of a larger dataset if the data retrieval and synthetic generation times are increased.
+
+<br><br>This dataset, which closely mirrors real-world applications, will optimize the evaluation of our models.
+
+<br><br></p>
+</body>
+</html>

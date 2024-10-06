@@ -1,4 +1,4 @@
-# <span style="color:#D9730D">L'importance du jeu de données</span>
+#  L'importance du jeu de données 
 
 ![alt text](image-3.png)
 Lorsqu'on démarre un problème en deep learning un reflexe est parfois de vouloir adapter une architecture existante à son problème, voire même de penser à faire sa propre architecture. Cette piste peut être coûteuse en temps pour des résultats ne dépassant pas les métriques d'évaluation des architectures déjà existantes.
@@ -15,7 +15,7 @@ Par ailleurs, avoir des données de grandes qualités et donc du même domaine q
 
 Partant de ce constat, il est conseillé de commencer la résolution d'un problème par la définition claire des cas d'applications afin de <u>construire son propre jeu de données.</u>
 
-#### <span style="color:">Créer son propre jeu de données, n'est-ce pas trop long ? </span>
+####  Créer son propre jeu de données, n'est-ce pas trop long ?  
 Effectivement créer un jeu de données peut être fastidieux, coûteux en temps et en argent. Il est nécessaire souvent d'annoter manuellement les données par exemple.
 Pour palier à ce problème d'annotation il existe une solution. **Les données synthétiques.**
 
@@ -25,7 +25,7 @@ Par conséquent, en combinant les outils fournis par Python (ou votre langage de
 
 **Afin d'illustrer cette pipeline, cet article propose l'automatisation de la création d'un jeu de données pour le *Visual Information Retrieval* et le *Document Visual Question Answering* (DocVQA) pour des diapositives en espagnol.**
 
-## <span style="color:#337EA9">Définition des tâches</span>
+##  Définition des tâches 
 Avant de décrire précisement la pipeline, définissons précisément notre cas d'utilisation afin de sélectionner au mieux les données.
 On cherche à construire un jeu de données de diapositives en espagnol permettant d'entrainer et d'évaluer des modèles pour le Document Visual Question Answering et le Visual Information Retrieval.
 #### Document Visual Question Answering (DocVQA)
@@ -36,10 +36,10 @@ On imagine donc que notre jeu de données devra avoir une feature image de type 
 #### Visual Information Retrieval
 Le Visual Information Retrieval c'est la tâche qui vise à déterminer parmi un grand nombre de documents et une question, quels sont les documents qui permettent de répondre à la question.
 
-## <span style="color:#337EA9"> Construction du jeu de données </span>
+##   Construction du jeu de données  
 Pour construire un jeu de donnée adapté on propose la pipeline suivante :
 1. Sélection d'une source de donnée de diapositive en espagnol et phase de récupération des données brutes.
-2. Génération des questions/réponses grâce à l'API d'un modèle texte/image (Gemini, Claude, ChatGPT...)
+2. Génération des questions/réponses grâce à l'API d'un modèle text/image (Gemini, Claude, ChatGPT...)
 3. Mise des données récupérées et synthétisées en un format partageable
 4. Filtrage sur les données afin d'éviter des données de mauvaise qualités
 
@@ -55,7 +55,7 @@ L'utilisation des données synthétiques est un avantage pour pouvoir construire
 
 Cet enjeu est souligné par le papier [ChatGPT outperforms crowd-workers for text-annotation tasks](https://arxiv.org/pdf/2303.15056).
 
-### <span style="color:#448361">Organisation du jeu de données</span>
+###  Organisation du jeu de données 
 Une présentation diapositive est composée d'une ou plusieurs diapositive.
 Après analyse des données disponible sur la page de chaque présentation diapositive on profile notre jeu de donnée pour avoir les features suivantes :
 1. Identifiant unique de la présentation
@@ -77,7 +77,7 @@ Voici donc les features retenues :
 | **lang**   |    langue renseignée par l’auteur de la présentation        |
 | **dim**    |      dimension d’une slide HxW      |
 | **likes**  |      nombre de like sur la présentation      |
-| **transcript**   |      liste contenant la transcription du texte de chaque slide      |
+| **transcript**   |      liste contenant la transcription du text de chaque slide      |
 | **mostRead** |      True pour les indices des listes les plues et False pour les autres.      |
 | **images**    |        il s’agit d’une liste de toutes les slides de la présentation.     |
 | **questions/answers**   |     il s’agit d’une liste de liste de dictionnaire de questions/réponses |
@@ -85,7 +85,7 @@ Voici donc les features retenues :
 
 Cette liste contient les paires questions/réponses de chaque diapositive (une diapositive peut avoir plusieurs paires questions/réponses)
 
-### <span style="color:#448361">Code</span>
+###  Code 
 Pour l'exemple, nous allons collecter et annoter une centaine de documents, mais le code peut être très facilement mis à l'échelle sur des milliers de documents en le laissant tourner plus longtemps.
 
 On utilise 3 notebooks python et un script python retrouvable à l'adresse suivante []. 
@@ -146,7 +146,7 @@ Ensuite, on exclut toutes présentations qui :
 
 A présent notre jeu de données a gagné en qualité.
 
-## <span style="color:#337EA9">Performances</span>
+##  Performances 
 Discutons des performances de cette démarche et de la pertinence de l'utilisation des données synthétiques.
 #### Temps de scraping
 Récuperer les diapositives s'est fait grâce à des requêtes HTTP. Avec Python il est possible de récupérer 10 présentations de 20 diapositives ainsi que leurs méta-données rangées en json en **12 min**. Ce temps comprends les temps de pauses que le programme effectue pour ne pas noyer le site de requêtes HTTP.
@@ -165,7 +165,7 @@ En comparaison l'annotation sythétique de 10 présentations à 20 slides avec C
 
 **Pour 200 paires de questions/réponses synthétiques, l'API Gemini met 4 minutes.** Ce qui en toute vraissemblance est plus rapide qu'une annotation humaine.
 
-## <span style="color:#337EA9">Conclusion et mise à l'échelle</span>
+##  Conclusion et mise à l'échelle 
 Nous avons donc réussi à génerer un jeu de données pour une application spécifique du Document Visual Question Answering et du Visual Information Retrieval à l'aide des données synthétiques.
 
 Outre un gain de temps dû à l'automatisation, nous pouvons également noter le coût financier qui est en la faveur des données synthétiques. Pour juger des performances de la démarche, on a finalement pu génerer un jeu de données de 3000 diapositives. La qualité des données synthétiques nous a permis de conserver 77% des paires de questions/générées après un filtrage basé sur la longueur de la réponse renvoyée.
