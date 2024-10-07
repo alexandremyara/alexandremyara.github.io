@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>)</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+
+    <!-- The loading of KaTeX is deferred to speed up page rendering -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+
+    <!-- To automatically render math in text elements, include the auto-render extension: -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"
+        onload="renderMathInElement(document.body);"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+            // Configuration optionnelle
+            delimiters: [
+                            {left: "$$", right: "$$", display: true},
+                            {left: "$", right: "$", display: false}
+                        ]
+            });
+        });
+    </script>
+</head>
+<body>
+<section id="vae-section">
+    <h1>Variationnal Auto Encoder (VAE)</h1>
+    <p>
+        In recent articles about image generation, the state-of-art seems to be accomplished by a model named <i>Variationnal Auto Encoder</i>.
+        To understand this model we need to go further in two keys concept : <i>Variationnal Inference</i> (VI) and <i>Auto Encoder</i> (AE).
+
+        <br><br>
+    </p>
+</section>
+<section id="variational-inf">
+    <h2>Varitional Inference (VI)</h2>
+    <p>
+        Variationnal Inference is a branch of statistic which try to approach an unkonwn distribution from known distributions $\{q_{\theta}\}$. A way to approach the unknown distribution is for example by adjusting parameters of the knowned distrbution.
+
+        <br><br>
+        For example if you want to approach a given distribtuion by using a Gaussian familly. You have to set correctly $\mu$ and $\sigma$ until your gaussian distribution $q_{\mu,\sigma}$ is <i>similar</i> to the distibution objective.
+        <img alt="gif" src="image/animation_pillow.gif"><br>
+
+        <br><br>
+        To start a <i>Variational Inference</i> it is necessary to get :
+        1. A familly of parameterized known distributions $\{q_{\theta}\}$.
+        2. A metric to compare how far we are of the unkown distibution.
+
+        <br><br>
+        A natural metric to compare the divergence between two distibution $p$ and $q$ is the <b>Kullback-Leiber divergence</b> KL :
+        $\textbf{KL(p||q)}=\int_Z q(z).\log{\frac{p(z)}{q(z)}}$ where Z is the definition set of p and q.
+
+        <br><br>
+    </p>
+</section>
+<section id="vi-general">
+    <h3>General formulation of VI problem</h3>
+    <p>
+        In pratice, we want to estimate a posterior distribution in order to solve machine learning problem.
+        Let $p(z|x)$ a posterior distribution and $p(x|z)$ the associates likelihood.
+
+        <br><br>
+        As a consequence, a <i>Variational Inference</i> (VI) problem with KL-divergence as a metric is formulated as :
+        $$ \argmin_{q\in Q} \textbf{KL}(q||p(z|x))$$
+        With expectation manipulations and Bayes rule the $\textbf{KL}$ become :
+
+        <br><br>
+        $\textbf{KL}(q||p(z|x))=-$<span style="border: 2px solid red; padding:3px">$(E[\log{q(z)}]-E[\log{p(x|z)}.p(z)])$</span>+$\log{p(x)}$
+
+        <br><br>
+        Maximise the red box is equivalent to minimize the $\textbf{KL}$.
+        This quantity in the red box is the <b>ELBO</b> (Evidence Lower Bound).
+
+        <br><br>
+    </p>
+</section>
+<section id="vi-problem-solve">
+    <h3>How to solve a VI problem ? What are known quatities ?</h3>
+    <p>
+        -> CAVI
+        -> Mean-field Approximation
+    </p>
+</section>
+<section id="stoch-vi">
+    <h3>Stochastic VI</h3>
+    <p>
+
+        <br><br>
+    </p>
+</section>
+<section id="autoenc">
+    <h2>Auto-Encoder</h2>
+    <p>
+
+        <br><br>
+    </p>
+</section>
+<section id="vae-section">
+    <h2>Variationnal Auto-Encoder (VAE)</h2>
+    <p>
+
+        <br><br>
+    </p>
+</section>
+<section id="img-app">
+    <h3>Application in image generation</h3>
+    <p>
+    </p>
+</section>
+<section id="nv-vae">
+    <h3>Nouveau Variationnal Auto-Encoder (NVAE)</h3>
+    <p>
+    </p>
+</section>
+</body>
+</html>
