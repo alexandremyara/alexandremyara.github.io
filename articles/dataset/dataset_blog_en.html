@@ -6,12 +6,11 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <a href="../../index.html", style="text-decoration: underline">back...</a>
 <section id="dataset-imp"><h1>The Importance of the Dataset </h1>
 <p>
 
-<br><br><img alt="alt text" src="image/image-3.png"><br>
-
-<br><br>When tackling a deep learning problem, it's common to instinctively modify an existing architecture to fit the task or even consider designing a new one from scratch.
+When tackling a deep learning problem, it's common to instinctively modify an existing architecture to fit the task or even consider designing a new one from scratch.
 
 <br><br>As highlighted in <a href="https://nonint.com/2023/06/10/the-it-in-ai-models-is-the-dataset/">The 'it' in AI models is the dataset</a>, the most significant lever to improve deep learning models relies in the training data rather than the architecture itself. Having data that is well-suited to a precise use case can significantly improve performance of the model for this use case.
 
@@ -98,23 +97,42 @@ These synthetic data are an asset for building your dataset, as they offer:
 <p>
 A presentation consists of one or more slides. After analyzing the available data for each slide presentation, we profile our dataset to include the following features:
 
-<br><br>| Feature                 | Description  |
-|------------|------------|
-|<b>id</b>|      unique identifier for the presentation      |
-| <b>presentation_url</b>    |      URL of the presentation on slideshare.net      |
-|<b>title</b>    |     presentation title       |
-| <b>author</b>   |       slideshare.net username of the author     |
-|<b>date</b>    |    date in YYYY-MM-DD format        |
-| <b>len</b> |       number of slides in the presentation     |
-| <b>description</b>    |      presentation description      |
-| <b>lang</b>   |    language specified by the author        |
-| <b>dim</b>    |      slide dimensions (HxW)      |
-| <b>likes</b>  |      number of likes on the presentation      |
-| <b>transcript</b>   |      list of slide text transcripts      |
-| <b>mostRead</b> |      True for the most-read slides, False for others.      |
-| <b>images</b>    |        list of all slide images in the presentation     |
-| <b>questions/answers</b>   |     list of dictionaries containing question/answer pairs for each slide |
-
+<br><br><table>
+    <thead>
+        <tr><th>Feature</th>
+<th>Description</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><b>id</b></td>
+<td>unique identifier for the presentation</td></tr>
+<tr><td><b>presentation_url</b></td>
+<td>URL of the presentation on slideshare.net</td></tr>
+<tr><td><b>title</b></td>
+<td>presentation title</td></tr>
+<tr><td><b>author</b></td>
+<td>slideshare.net username of the author</td></tr>
+<tr><td><b>date</b></td>
+<td>date in YYYY-MM-DD format</td></tr>
+<tr><td><b>len</b></td>
+<td>number of slides in the presentation</td></tr>
+<tr><td><b>description</b></td>
+<td>presentation description</td></tr>
+<tr><td><b>lang</b></td>
+<td>language specified by the author</td></tr>
+<tr><td><b>dim</b></td>
+<td>slide dimensions (HxW)</td></tr>
+<tr><td><b>likes</b></td>
+<td>number of likes on the presentation</td></tr>
+<tr><td><b>transcript</b></td>
+<td>list of slide text transcripts</td></tr>
+<tr><td><b>mostRead</b></td>
+<td>True for the most-read slides, False for others.</td></tr>
+<tr><td><b>images</b></td>
+<td>list of all slide images in the presentation</td></tr>
+<tr><td><b>questions/answers</b></td>
+<td>list of dictionaries containing question/answer pairs for each slide</td></tr>
+    </tbody>
+</table>
 <br><br>This list contains question/answer pairs for each slide (one slide may have multiple question/answer pairs).
 
 <br><br></p></section>
@@ -214,6 +232,7 @@ In comparison, the synthetic annotation of 10 presentations with 20 slides using
 <img alt="" src="image/generation_cost.png"><br>
 
 <br><br></p></section>
+<section>
 <h2>Conclusion and Scaling </h2>
 <p>
 We have successfully generated a dataset for a specific application of Document Visual Question Answering and Visual Information Retrieval using synthetic data.
@@ -228,6 +247,6 @@ We have successfully generated a dataset for a specific application of Document 
 
 <br><br>This dataset, which closely mirrors real-world applications, will optimize the evaluation of our models.
 
-<br><br></p>
+<br><br></p></section>
 </body>
 </html>
