@@ -30,21 +30,34 @@ h2 {
     font-weight: lighter;
     color: #666;
 }
+#presentation{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.presentation-title{
+    margin-left : -20px;
+}
 
 .presentation-container {
     display: flex;
-    align-items: center;
+    align-items: flex-start; /* Aligner l'image et le texte en haut */
+    gap: 20px; /* Ajouter un espace entre l'image et le texte */
+    margin-top: 20px;
+    /*margin-left: 20px;*/
 }
-
-.photo img {
+.presentation-container p {
+    flex: 1; /* Le paragraphe prend tout l'espace restant */
+    margin-top: -7px; /* Supprimer les marges par défaut si nécessaire */
+}
+img {
     object-fit: cover;
+    float: left;
     width: 250px;
     height: 200px;
-    margin-top: 75px;
-}
-
-.texte {
-    flex-grow: 1;
+    margin-top:0;
+    margin-right: 10px;
 }
 
 section {
@@ -78,10 +91,18 @@ th {
     color: white;
 }
 
+li{
+    line-height: 1.6;
+}
 #cv h2 {
     text-align: center;
     margin-top: 40px;
 }
+
+.course_description{
+    margin-left: 50px;
+}
+
 a {
     color: #0066cc;
     text-decoration: none;
