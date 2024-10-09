@@ -101,7 +101,8 @@ A natural improvement would be to use mini-batches, thus introducing stochastic 
 As a result, we adapt *Coordinate Ascent VI* (CAVI) into *Gradient Ascent VI* in its stochastic version, meaning the same algorithms, but using mini-batches instead of the full dataset.
 *If you are not familiar with mini-batches methods you can check this [link](https://towardsdatascience.com/batch-mini-batch-stochastic-gradient-descent-7a62ecba642a).*
 
-This opens the door to *Stochastic Varitionnal Inference*, with more scalable and better suited to large dataset algorithms.
+This opens the door to *Stochastic Variational Inference*, with more scalable and better suited to large dataset algorithms.
+![](image/vi-methods/3.png)
 
 
 ## Auto-Encoder
