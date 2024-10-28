@@ -28,4 +28,5 @@ jobs:
         with:
           personal_token: ${{ secrets.ACTIONS_DEPLOY_KEY }}
           publish_dir: ./public
-          
+          publish_branch: gh-pages
+
