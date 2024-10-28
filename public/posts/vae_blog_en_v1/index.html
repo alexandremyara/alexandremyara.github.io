@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+
+<link rel="icon" type="image/png" href="icon/icon.png">
+<title>VAE</title>
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+    <link rel="stylesheet" href="/css/posts.css">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+
+<br><br>    
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+
+<br><br>    
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"
+        onload="renderMathInElement(document.body);"></script>
+
+<br><br>    <script>document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+            
+            delimiters: [
+                            {left: "$$", right: "$$", display: true},
+                            {left: "$", right: "$", display: false}
+                        ]
+            });
+        });
+    </script>
+</head>
+<body>
+    
+    
+    <article>
+        <h1>VAE</h1>
+        <div><h1 id="from-variational-inference-to-variationnal-auto-encoder-vae-and-more">From Variational Inference to Variationnal Auto Encoder (VAE) and more</h1>
+<p>In recent articles on data generation, the state of the art appears to be achieved by models based on the <code>Variationnal Auto Encoder</code>.
+To understand this model, we need to delve into two key concepts: <code>Variationnal Inference</code> (VI) and <code>Auto Encoder</code> (AE).</p>
+<h4 id="summary"><strong>Summary</strong></h4>
+<h5 id="i-variational-inference--elbo-cavi-and-bbvi">I. Variational Inference : ELBO, CAVI and BBVI</h5>
+<h5 id="ii-auto-encoders--theory-and-applications">II. Auto-Encoders : Theory and applications</h5>
+<h5 id="iii-varitional-auto-encoders--vae-beta-vae-cvae-vq-vae-hierarchical-vae">III. Varitional Auto-Encoders : VAE, $\beta$-VAE, CVAE, VQ-VAE, Hierarchical VAE</h5>
+<h3 id="context">Context</h3>
+<p>Consider a dataset $\mathcal{D}$ of images, where $x$ denotes a unique sample of $\mathcal{D}$.</p>
+<p>Our goal is to build a model capable of generating new images, specifically images that are not in $\mathcal{D}$.</p>
+<p>To enable generation, we need to obtain $p^*(x)$ (the <code>marginal likelihood</code> or <code>model evidence</code>), which represents the true distribution of the data. However, since we only have one dataset $\mathcal{D}$, we lack access to all possible data points.</p>
+<p>Thus, we approximate $p^*(x)$ with $p_\theta(x)$. To optimize $\theta$, we need to differentiate the function $p_\theta$ (to find the maximum marginal likelihood).</p>
+<p>However, $p_\theta(x)$ is an intractable integral.</p>
+<p>To address this issue, we introduce a second variable $z$ (from a latent space $Z$) and the <code>Bayes' rule</code>  :
+</p>
+$$p_\theta(x)=\frac {p_\theta(z,x)}{p(z|x)}$$<p>Good news : $p_\theta(z,x)$ is tractable.
+Bad news : $p_\theta(z|x)$ is untractable.</p>
+<p><strong>The final idea is to approximate $p_\theta(z|x)$ with optimization methods (Variationnal Inference) then to construct a model based on this approximate distribution: the Variational Auto-Encoder.</strong></p>
+<h2 id="i-varitional-inference-vi">I. Varitional Inference-VI</h2>
+<p><code>Variationnal Inference</code> is a branch of statistics that aims to approximate an unknown distribution using known distributions  $\{q_{\phi}\}$. One approach to approximate the unknown distribution is by adjusting $\phi$, the parameter of the known distribution..</p>
+<p>For example, if you want to approximate a given distribution using a Gaussian family, you need to adjust $\mu$ and $\sigma$ so that your gaussian distribution $q_{\mu,\sigma}$ closely matches the target distribution.
+<img src="/vae/animation_pillow.gif" alt=""></p>
+<p><strong>To initiate a <em>Variational Inference</em> you need the following elements :</strong></p>
+<ol>
+<li><strong>A family</strong> of parameterized known distributions $\{q_{\phi}\}$.</li>
+<li><strong>A metric</strong> to measure the distance from the unknown distribution.</li>
+</ol>
+<p>For further exploration of these concepts, you can refer to <a href="https://arxiv.org/pdf/1601.00670">VI : a review for statisticians</a>.</p>
+<h3 id="general-formulation-of-vi-problem-and-elbo">General formulation of VI problem and ELBO</h3>
+<p>A natural metric to compare the divergence between two distibution $p$ and $q$ is the <code>Kullback-Leiber divergence</code> KL :</p>
+<p>$\textbf{KL(p||q)}=\int_\Omega q(\omega).\log{\frac{p(\omega)}{q(\omega)}}$ where $\Omega$ is the definition set of p and q.</p>
+<p>In order to <strong>estimate a posterior</strong>, we have data $x \in \mathcal D$.</p>
+<p>We consider a latent space $Z$.
+Then we choose distribution family $\mathcal Q$ for $q_\phi(z|x)$(the approximate posterior).</p>
+<p>As a result, a <code>Varitional Inference</code> (VI) problem with <code>KL-divergence</code> as a metric is formulated as :
+</p>
+$$ \argmin_{q_\phi\in \mathcal Q} \textbf{KL}(q_\phi(z|x)||p_\theta(z|x))$$<p>
+With expectation manipulations and Bayes rule the <code>KL</code> become :</p>
+<p>$\textbf{KL}(q_\phi(z|x)||p_\theta(z|x))=$<!-- raw HTML omitted -->$\mathbb{E_{q_\phi(z|x)}}(\log{p_\theta(x|z)}.p_\theta(z))-\mathbb{E_{q_\phi(z|x)}}(\log{q_\phi(x|z)})$<!-- raw HTML omitted -->+$\log{p_\theta(x)}$</p>
+<p>$\textbf{KL}(q_\phi(z|x)||p_\theta(z|x))=$-<!-- raw HTML omitted -->$\textbf{ELBO}$<!-- raw HTML omitted -->+$\log{p_\theta(x)}$</p>
+<p>Maximise <!-- raw HTML omitted -->the red box<!-- raw HTML omitted --> is equivalent to minimize the <code>KL</code>.
+This quantity, in the red box, is the <code>ELBO</code> (Evidence Lower Bound).
+</p>
+$$\textbf{ELBO}=\mathbb{E_{q_\phi(z|x)}}(\log{q_\phi(z|x)})-\mathbb{E_{q_\phi(z|x)}}(\log{p_\theta(x|z)}.p_\theta(z))$$<p>Another form for the ELBO, more suited to machine learning formulation, is :
+</p>
+$$\textbf{ELBO} = \mathbb{E_{q_\phi(z|x)}}(\log{p_\theta(x|z)})-\textbf{KL}(q_\phi(z|x)||p_\theta(z))$$<p>We named this quantity <code>ELBO</code> because it is the lower-bound of the integral $\log{p_\theta(x)}$ :
+</p>
+$$\log(p_\theta(x)) \geq \textbf{ELBO}$$<p>Moreover, we have an unbiased estimator of the <code>ELBO</code> with <code>Monte-Carlo mathod</code>, since the <code>ELBO</code> is an expectation.</p>
+<p><strong>To conclude, a Variational Inference problem can be writen as the argmax of the <code>ELBO</code></strong>: </p>
+$$\argmax_{\theta,\phi}\mathbb{E_{q_\phi(z|x)}}(\log{q_\phi(z|x)})-\mathbb{E_{q_\phi(z|x)}}(\log{p_\theta(x|z)}.p_\theta(z))$$<h3 id="how-to-maximize-the-elbo--cavi--coordinate-ascent-vi">How to maximize the ELBO ? CAVI : Coordinate Ascent VI</h3>
+<p>The fundamental algorithm to maximize <code>ELBO</code> and estimate the approximate distribution $q$ is the <code>Coordinate Ascent VI</code> (CAVI) algorithm.</p>
+<p>For computation in the ( d )-dimensional case, <code>CAVI</code> makes an assumption about the distribution.
+We assume that each dimension is independent, i.e., $q = \Pi_{i=1}^d q_j(z_j)$.
+This assumption is known as the <code>Mean-Field Approximation</code>.</p>
+<p>The CAVI algorithm proposes calculating the optimal distribution for direction $j$ by fixing the values of other variables in their respective directions.</p>
+<p>It can be shown that, using the <strong>KL</strong> divergence as a metric, the optimal distribution $q_{\phi}(z_j)$ (the distribution that maximizes <code>ELBO</code>) for direction $j$ is proportional to </p>
+$$\exp(\mathbb{E}_{-j}[p_\theta(z,x)])$$<p>,
+where $ \mathbb{E}_{-j}$ is the expectation with respect to $q_{1,2,\dots,j-1,j+1,\dots,n}$.</p>
+<p>For further mathematical details, you can refer to the <em>Meerkat Statistic</em>&rsquo;s course on VI.</p>
+<p>Here is the algorithm:</p>
+<p>Initialization: Set parameters randomly.</p>
+<ol>
+<li>Compute all optimal distributions $q(z_j)$. Note that the form of $q(z_j)$ depends on the form of $q(z_i)$.</li>
+<li>Compute the <code>ELBO</code>.</li>
+</ol>
+<p>Repeat these steps until $|\textbf{ELBO}_t - \textbf{ELBO}_{t-1}| < \epsilon$.</p>
+<h3 id="from-gradient-ascent-vi-and-normal-gradient-to-bbvi">From Gradient Ascent VI and Normal Gradient to BBVI</h3>
+<p>Since the goal is to find the optimal values of $(\theta, \phi)$ by maximizing <code>ELBO</code>, we can sometimes compute its gradient and perform the optimization of $(\theta, \phi)$ similarly to a gradient descent.</p>
+$$\theta^{t} = \theta^{t-1}+\alpha^t.\nabla_\theta\textbf{ELBO} \\
+\phi^{t} = \phi^{t-1}+\alpha^t.\nabla_\phi\textbf{ELBO}$$<p>This method is called <strong>Gradient Ascent VI</strong>.</p>
+<p><!-- raw HTML omitted --> <em>But is the gradient really a good metric to compare distributions ?</em><!-- raw HTML omitted -->
+The gradient (and derivatives in general) are naturally defined using an Euclidean distance.
+Here, the Euclidean distance is considered in the parameter space.</p>
+<p>Let&rsquo;s look at an example.
+<img src="/vae/di-similar_gauss.png" alt="">
+Visually, the first two distributions are similar, while the other two barely overlap.
+However, the canonical Euclidean distance with respect to $\mu$ suggests the opposite.</p>
+<p><strong>The Euclidean gradient is sometimes not well adapted to VI.</strong></p>
+<p><!-- raw HTML omitted --> The solution : Natural Gradient, a Riemanian gradient <!-- raw HTML omitted -->
+As explained in this <a href="https://arxiv.org/html/2406.01870v1">paper</a>, the solution is to define a gradient in a Riemannian space using a symmetric version of the <strong>KL</strong> divergence.
+This solution is also discussed in the <a href="https://arxiv.org/pdf/1206.7051">Stochastic VI paper</a>.</p>
+<p>This gradient is called the <code>Natural Gradient</code> and is denoted by $\nabla^{\text{natural}}=\mathcal{I}^{-1}(q) \cdot \nabla$.
+It is the product of the inverse of the <code>Fischer matrix</code> and the original gradient.</p>
+<p>This leads to the definition of the <code>Natural Gradient Ascent VI</code>, which incorporates the normal gradient into its formula.
+</p>
+$$\theta^{t} = \theta^{t-1}+\alpha^t.\nabla_\theta^{\text{natural}}\textbf{ELBO}\\
+\phi^{t} = \phi^{t-1}+\alpha^t.\nabla_\phi^{\text{natural}}\textbf{ELBO} $$<p>Here is a summary of the VI methods to obtain the posterior distribution from the ELBO:
+<img src="/vae/vi-methods/2.png" alt=""></p>
+<p><strong><!-- raw HTML omitted --> How to compute ELBO gradients ? Is there a trick ?<!-- raw HTML omitted --></strong></p>
+<p>As in Gradient Ascent VI, the Normal Gradient is <strong>easy to compute with an exponential family</strong>; however, approximating distributions with complex models complicates the calculations.</p>
+<p>The difficulty arises from deriving the integral (since expectation is an integral) for the gradient with respect to $\phi$ : </p>
+$$\nabla_\phi \textbf{ELBO} = \nabla_\phi \mathbb{E}_{q_\phi(z|x)}(\log{q_\phi(z|x)}-\log{p_\theta(x|z)}.p_\theta(z))$$<p>To simplify the computation we use the <code>log-derivative trick</code>.</p>
+<p>It can be shown that : </p>
+$$\nabla_\phi \textbf{ELBO} = \mathbb{E}_{q_\phi(z|x)}[(\log{p_\theta(x|z)}.p_\theta(z)-\log{q_\phi(z|x)}).\nabla_\phi \log{q_\phi(z|x)}]$$<p>
+With this trick, the gradient is applied only to $\log{q(z)}$</p>
+<h3 id="from-gradient-ascent-vi-and-normal-gradient-to-bbvi-1">From Gradient Ascent VI and Normal Gradient to BBVI</h3>
+<p>Since the goal is to find the optimal values of $(\theta, \phi)$ by maximizing <code>ELBO</code>, we can sometimes compute its gradient and perform the optimization of $(\theta, \phi)$ similarly to a gradient descent.</p>
+$$\theta^{t} = \theta^{t-1}+\alpha^t.\nabla_\theta\textbf{ELBO} \\
+\phi^{t} = \phi^{t-1}+\alpha^t.\nabla_\phi\textbf{ELBO}$$<p>This method is called <strong>Gradient Ascent VI</strong>.</p>
+<p><!-- raw HTML omitted --> <em>But is the gradient really a good metric to compare distributions ?</em><!-- raw HTML omitted -->
+The gradient (and derivatives in general) are naturally defined using an Euclidean distance.
+Here, the Euclidean distance is considered in the parameter space.</p>
+<p>Let&rsquo;s look at an example.
+<img src="/vae/di-similar_gauss.png" alt="">
+Visually, the first two distributions are similar, while the other two barely overlap.
+However, the canonical Euclidean distance with respect to $\mu$ suggests the opposite.</p>
+<p><strong>The Euclidean gradient is sometimes not well adapted to VI.</strong></p>
+<p><!-- raw HTML omitted --> The solution : Natural Gradient, a Riemanian gradient <!-- raw HTML omitted -->
+As explained in this <a href="https://arxiv.org/html/2406.01870v1">paper</a>, the solution is to define a gradient in a Riemannian space using a symmetric version of the <strong>KL</strong> divergence.
+This solution is also discussed in the <a href="https://arxiv.org/pdf/1206.7051">Stochastic VI paper</a>.</p>
+<p>This gradient is called the <code>Natural Gradient</code> and is denoted by $\nabla^{\text{natural}}=\mathcal{I}^{-1}(q) \cdot \nabla$.
+It is the product of the inverse of the <code>Fischer matrix</code> and the original gradient.</p>
+<p>This leads to the definition of the <code>Natural Gradient Ascent VI</code>, which incorporates the normal gradient into its formula.
+</p>
+$$\theta^{t} = \theta^{t-1}+\alpha^t.\nabla_\theta^{\text{natural}}\textbf{ELBO}\\
+\phi^{t} = \phi^{t-1}+\alpha^t.\nabla_\phi^{\text{natural}}\textbf{ELBO} $$<p>Here is a summary of the VI methods to obtain the posterior distribution from the ELBO:
+<img src="/vae/vi-methods/2.png" alt=""></p>
+<p><strong><!-- raw HTML omitted --> How to compute ELBO gradients ? Is there a trick ?<!-- raw HTML omitted --></strong></p>
+<p>As in Gradient Ascent VI, the Normal Gradient is <strong>easy to compute with an exponential family</strong>; however, approximating distributions with complex models complicates the calculations.</p>
+<p>The difficulty arises from deriving the integral (since expectation is an integral) for the gradient with respect to $\phi$ : </p>
+$$\nabla_\phi \textbf{ELBO} = \nabla_\phi \mathbb{E}_{q_\phi(z|x)}(\log{q_\phi(z|x)}-\log{p_\theta(x|z)}.p_\theta(z))$$<p>To simplify the computation we use the <code>log-derivative trick</code>.</p>
+<p>It can be shown that : </p>
+$$\nabla_\phi \textbf{ELBO} = \mathbb{E}_{q_\phi(z|x)}[(\log{p_\theta(x|z)}.p_\theta(z)-\log{q_\phi(z|x)}).\nabla_\phi \log{q_\phi(z|x)}]$$<p>
+With this trick, the gradient is applied only to $\log{q(z)}$.</p>
+<p>Then the gradient is computed with the <code>Monte-Carlo method</code> from sample of $q(z)$. This calculation is feasible because at a fixed time, $q(z)$ is known.</p>
+<p>In summary, the ELBO&rsquo;s gradient with respect to $\phi$ takes the following approximation in the general case: </p>
+$$\nabla_\phi \textbf{ELBO}(x^k) \approx \frac 1 S \sum_i{(\log{p_\theta(x^k|z_i)}.p_\theta(z_i)-\log{q_\phi(z_i|x^k)}).\nabla_\phi \log{q_\phi(z_i|x^k)}} \\ z_i \sim q $$<p>This formula provides a <!-- raw HTML omitted -->stochastic approximation<!-- raw HTML omitted --> of the gradient. We will see that this kind of stochastic approach can be extended to improve VI.</p>
+<p>Finally, to compute the ELBO&rsquo;s gradient with respect to $\theta$, we only have to apply the gradient to the expectation:
+</p>
+$$\nabla_\theta\textbf{ELBO}(x^k)\approx-\sum_i\nabla_\theta [\log p_\theta(x^k,z_i)] $$<h3 id="stochastic-vi-and-limitations-of-classic-vi-algorithms">Stochastic VI and Limitations of classic VI algorithms</h3>
+<p>The main drawback of classic VI is that each substep and iteration requires processing the entire dataset.</p>
+<p>An intuitive improvement is to use <code>mini-batches</code>, which introduces stochastic behavior.</p>
+<p>Consequently, we adapt <code>Coordinate Ascent VI</code> (CAVI) and <code>Gradient Ascent VI</code> to their stochastic versions, which apply the same algorithms but use mini-batches instead of the entire dataset.</p>
+<p><em>If you are not familiar with mini-batches methods you can check this <a href="https://towardsdatascience.com/batch-mini-batch-stochastic-gradient-descent-7a62ecba642a">link</a>.</em></p>
+<p>This leads to <code>Stochastic Variational Inference</code> (SVI), which is <strong>more scalable</strong> and better <strong>suited to large datasets</strong>.
+<img src="/vae/vi-methods/3.png" alt=""></p>
+<p><strong><!-- raw HTML omitted -->Black-Box Variational Inference - BBVI<!-- raw HTML omitted --></strong> :
+By combining <code>mini-batches</code> with a stochastic approximation of the gradient, we develop a comprehensive method of Stochastic Variational Inference that operates on complex models without requiring the mean-field assumption: <code>Black-Box VI</code>.</p>
+<p>You can read the original paper here : <a href="https://arxiv.org/pdf/1401.0118">BBVI</a>.</p>
+<p>The BBVI optimizes the <code>ELBO</code> with the following algorithm :</p>
+<ol>
+<li>Choose a statistical model and a family distribution for $q_\phi(z|x)$. Initialize with random values for $\phi$ and $\theta$.</li>
+<li>Draw samples $\{z_i\}$ from $q_\phi(z|x)$</li>
+<li>Apply the <code>log-derivative trick</code> and <code>Monte-Carlo method</code> to estimate the gradient : $$\nabla_\phi \textbf{ELBO}(x^k) \approx \frac 1 S \sum_i{(\log{p_\theta(x^k|z_i)}.p_\theta(z_i)-\log{q_\phi(z_i|x^k)}).\nabla_\phi \log{q_\phi(z_i|x^k)}}\\
+\nabla_\theta\textbf{ELBO}(x^k)\approx-\sum_i\nabla_\theta [\log p_\theta(x^k,z_i)]$$</li>
+<li>Construct <code>mini-batches</code> with your dataset and refresh the $\theta$ with : $$\theta^{t} = \theta^{t-1}+\alpha^t.\nabla_\theta\textbf{ELBO} \\
+\phi^{t} = \phi^{t-1}+\alpha^t.\nabla_\phi\textbf{ELBO}$$</li>
+</ol>
+<p>However, this method&rsquo;s flexibility often results in high variance.
+To address this, the paper suggests solutions such as <code>Rao-Blackwellization</code> and control variates methods. The last one is introduced in this <a href="https://arxiv.org/pdf/1301.1299">paper</a>.</p>
+<p>You can read the BBVI paper to see updated algorithms.</p>
+<h3 id="conclusion-about-vi">Conclusion about VI</h3>
+<p>In conclusion, we have seen that <code>Variational Inference</code> provides algorithms <strong>to approximate posterior distributions</strong>. These algorithms approach this approximation as an optimization problem. The objective function for optimization is the <code>Evidence Lower Bound</code> (ELBO).</p>
+<p>However, with <strong>large datasets</strong>, <code>VI</code> algorithms become computationally demanding.
+Additionally, gradient-based algorithms rely on strong assumptions that are not always appropriate.</p>
+<p>This led to the development of <code>Stochastic Variational Inference</code> (SVI), where algorithms like <code>BBVI</code> perform well despite high variance.</p>
+<p>In the third part of this article, we will explore how this technology has become central to generative AI. The key lies in leveraging an Autoencoder architecture trained with <code>Variational Inference</code> following principles similar to <code>BBVI</code>.</p>
+<h2 id="ii-auto-encoder">II. Auto-Encoder</h2>
+<p><code>Auto-Encoder</code> is a type of neural network architecture that represents a specific case of the <code>Encoder-Decoder</code> framework.</p>
+<p>Today, encoder-decoder architectures are at the forefront of major challenges in deep learning.
+Let&rsquo;s do a quick recap of these architectures.</p>
+<h3 id="from-encoder-decoder-to-auto-encoder">From Encoder-Decoder to Auto-Encoder</h3>
+<p><code>Encoder-Decoder</code> networks are neural networks suited for sequence-to-sequence tasks. They consist of two main components:</p>
+<ol>
+<li><code>Encoder</code>: processes the input and creates a fixed-size representation (known as an <code>embedding</code>) in a latent space, aiming to capture the essential information.</li>
+<li><code>Decoder</code>: uses the embedding as input and generates an output step-by-step from it.</li>
+</ol>
+<p><img src="/vae/encoder-decoder.png" alt=""></p>
+<p>For instance, if we have a 28x28 pixel image containing a circle, it can be compressed into a 3D vector representing the center position and radius of the circle. This is the role of the <code>encoder</code>.</p>
+<p>Then, using these latent variables, the <code>decoder</code> can infer information such as whether the circle’s area exceeds a certain threshold.</p>
+<p>The <code>Auto-Encoder</code> is essentially an encoder-decoder architecture, except its <strong>objective is to reconstruct</strong> the encoder’s input $x$.
+If I give $x$ as input to the model, I want $x$ as the decoder&rsquo;s output.</p>
+<p>In the example of the circle image, the <code>decoder</code> would generate a circle with the appropriate radius and center position.</p>
+<p>At first glance, this may seem unhelpful. However, this concept enables tasks such as:</p>
+<ol>
+<li>Image reconstruction</li>
+<li>Image denoising</li>
+<li>Learning compression</li>
+</ol>
+<p>For instance, in document compression, the document $d$ is passed through the <code>encoder</code>. This results in a compressed representation of the document in the <code>latent space</code>.
+Since the <code>encoder</code> retains only the key information, the document is now compressed.
+The decoder can then reconstruct the document using the <code>auto-encoder</code> principle: the <code>encoder</code> input is also the <code>decoder</code> output.</p>
+<p><!-- raw HTML omitted --><strong>Can data be generated once the latent space is built?</strong><!-- raw HTML omitted -->
+Let&rsquo;s consider an <code>auto-encoder</code> trained for image reconstruction with a <code>latent space</code> $Z$.
+What if we take a random point $z \in Z$ and pass it to the decoder to generate an image?</p>
+<p>The produced image will likely be incoherent because the <code>latent space</code> generated by an <code>auto-encoder</code> is unstructured.</p>
+<p>This is true even if we choose a $z_0$ point near a $z_1$ point that represents a real, coherent image.
+<img src="/vae/auto.gif" alt=""></p>
+<p>Indeed, unless the $z$ point originates from the dataset, there is no reason for $z$ to correspond to a coherent image.</p>
+<p><strong>In conclusion, if our goal is data generation, we need to build an organized and continuous latent space.</strong></p>
+<h2 id="iii-variational-auto-encoder-vae">III. Variational Auto-Encoder (VAE)</h2>
+<p><code>Variational Auto-Encoder</code> (VAE) is an enhancement of the traditional <code>auto-encoder</code> achieved through <code>Stochastic Variational Inference</code>.</p>
+<p><strong>We train VAEs by constraining the latent space to approximate a fixed distribution using variational inference methods. This results in a more continuous and organized latent space.</strong></p>
+<p>We model the VAE and the data as follows:</p>
+<p><img src="/vae/vae_space.png" alt=""></p>
+<ol>
+<li>The input dataset ( \mathcal{D} ) and its corresponding representation in the latent space, ( \mathcal{D&rsquo;} )</li>
+<li>( p_\theta(x) ): the modeled distribution of the dataset images in the input space, and ( p_\theta(z) ): the modeled distribution of the latent variables in the latent space.</li>
+<li>( p_\theta(z|x) ): the distribution mapping the input space to the latent space, and ( p_\theta(x|z) ): the distribution mapping the latent space to the output space.</li>
+</ol>
+<p>Using similar notation, we denote the true distributions as ( p^<em>(x) ) and ( p^</em>(z) ).</p>
+<p>We aim to approximate ( p_\theta(z|x) ) with ( q_\theta(z|x) ) using variational inference, seeking to maximize the ELBO.</p>
+<p>The VAE paper introduces a method for computing the ELBO gradient with reduced variance, known as the <code>reparametrization trick</code>. As a result, the training algorithm differs slightly from that of <code>BBVI</code>. (<a href="https://arxiv.org/pdf/1506.02557">see paper</a>).</p>
+<h3 id="reparametrization-trick">Reparametrization trick</h3>
+<p>As with BBVI, the main issue lies in calculating the gradient with respect to ( \phi ).
+Specifically, we have:</p>
+$$
+\nabla_\theta\textbf{ELBO}(x^k) \approx -\frac{1}{S} \sum_i \nabla_\theta [\log p_\theta(x^k, z_i)]
+$$$$
+\nabla_\phi\textbf{ELBO}(x^k) = \mathbb{E}_{q_\phi(z|x^k)} \left[\nabla_\phi \left(\log p_\theta(z, x^k) - \log q_\phi(z|x^k) \right)\right] + \int_z \left(\log p_\theta(z, x^k) - \log q_\phi(z|x^k) \right) \nabla_\phi q_\phi(z|x^k) \, dz
+$$<p>The gradient with respect to ( \phi ) is not expressed as a simple expectation and becomes intractable due to the stochastic nature of ( q_\phi(z|x) ).</p>
+<p>To address this, we introduce a differentiable transformation that separates the stochastic component from the gradient:</p>
+$$
+z = T(\epsilon, \phi)\\
+\epsilon \sim \mathcal{p}(\epsilon)
+$$<p><img src="/vae/reparametrization_trick.png" alt=""></p>
+<p>This trick allows us to express the expectation with respect to ( p(\epsilon) ) and then apply the <code>Monte Carlo estimator</code> to approximate the ELBO&rsquo;s gradient:</p>
+$$
+\nabla_\phi\textbf{ELBO}(x^k) \approx \frac{1}{S} \sum_i \nabla_\phi \log q_\phi(z_i|x^k)
+$$<h3 id="training-vae-in-practice">Training VAE in practice</h3>
+<p>Now we know how to compute the gradient of the ELBO using the <code>reparametrization trick</code>.<br>
+The idea of a VAE is to construct the latent space by considering the encoder and decoder functions as probability distributions.<br>
+It is then possible to construct the latent space with variational inference.</p>
+<p>The network&rsquo;s loss function is the ELBO rewritten in its appropriate machine learning form: </p>
+$$\textbf{ELBO} = \mathbb{E_{q_\phi(z|x)}}(\log{p_\theta(x|z)})-\textbf{KL}(q_\phi(z|x)||p_\theta(z))$$<p>We have to set 3 distributions: $p_\theta(z)$, the distribution of the latent space; $p_\theta(x|z)$, the likelihood (or here the decoder distribution); and $q_\phi(x|z)$, the approximate posterior (or here the encoder distribution).</p>
+<p><!-- raw HTML omitted -->Choice of $p_\theta(z)$ for the training:<!-- raw HTML omitted --><br>
+Once $p_\theta(z)$ is set, the latent data will be distributed according to this distribution.<br>
+We want a continuous space, so the natural choice is to set $p_\theta(z) \sim \mathcal N(0,1)$.</p>
+<p><img src="/vae/normal_latent.png" alt=""></p>
+<p><!-- raw HTML omitted -->Choice of $q_\phi(z|x)$ for the training:<!-- raw HTML omitted --><br>
+Since $p_\theta(z)$ is Gaussian, we will have an analytical solution for the $\textbf{KL}(q_\phi(z|x)||p_\theta(z))$ term if we choose $q_\phi(z|x) \sim \mathcal{N(z|\mu(x),\sigma^2(x))}$.</p>
+<p>As a consequence, we have with calculus: $\textbf{KL}(q_\phi(z|x)||p_\theta(z)) = -\frac 1 2(\log\sigma^2-\mu^2-\sigma^2+1)$.</p>
+<p><!-- raw HTML omitted -->Choice of $p_\theta(x|z)$ for the training:<!-- raw HTML omitted --><br>
+This distribution will determine the output distribution.<br>
+This choice depends on the type of images we are working with. For example, if our dataset is MNIST, we will choose a Bernoulli distribution. However, if our dataset is the Iris dataset, we will choose a continuous natural distribution, like a Gaussian.</p>
+<p>For this article, we will choose a Gaussian: $p_\theta(x|z) \sim \mathcal N(y_\mu, y_\sigma^2)$.<br>
+To reduce the variance in the output, we set $y_\sigma=1$.<br>
+Thus, the expectation term in the ELBO loss function becomes: $\mathbb{E_{q_\phi(z|x)}}(\log{p_\theta(x|z)})=-\log\sqrt(2\pi)-(x-y_\mu)^2$.<br>
+Up to an additive constant, $\mathbb{E_{q_\phi(z|x)}}(\log{p_\theta(x|z)})=(x-y_\mu)^2$.</p>
+<p><!-- raw HTML omitted --><strong>Amortized Variational Inference</strong><!-- raw HTML omitted --><br>
+Rather than considering the distribution $q_\phi$ as the output of the encoder, we consider parameters like $\mu$ and $\sigma$ as the output of the encoder.<br>
+The encoder becomes a function $f$ that maps data $x$ to $(\mu, \sigma)$.</p>
+<p>The advantage is that we don&rsquo;t need to recompute the map $x \rightarrow (\mu, \sigma)$ when we add new samples to the batch.<br>
+This method is called <code>amortized variational inference</code>.</p>
+<p>Thus, the expectation term in the ELBO loss function becomes deterministic and corresponds to the MSE loss between the original data and the expectation of $p_\theta(x|z)$.</p>
+<p><strong>As a consequence, a VAE is an encoder-decoder model where the encoder learns $\mu$ and $\sigma$.<br>
+These parameters are learned through a dataset $\mathcal D$ and the ELBO loss function:</strong><br>
+</p>
+$$\mathcal L(x^k, \mu,\sigma,y_\mu) = -\frac 1 2(\log\sigma^2-\mu^2-\sigma^2+1) + (x-y_\mu)^2$$<p><br>
+The gradient is computed with the reparametrization trick and then is updated with an optimizer on parameters of distributions.</p>
+<p><img src="/vae/amortized-vae.png" alt=""></p>
+<p>A typical forward pass involves feeding the encoder an image $x$, after which the encoder produces $\mu$ and $\sigma$.<br>
+Then we sample $\epsilon$, and we have a $z$ sampled.<br>
+We feed this $z$ into the decoder, and the decoder produces an output $y$.<br>
+This training produces a latent space that is continuous and organized compared to classic auto-encoders.</p>
+<p>If we want to generate an image $x'$ that resembles an original image $x$, I just need to get $\mu(x), \sigma(x)$ and then sample $\epsilon$.
+Then we get $z'=\mu+\epsilon.\sigma$.
+If we just want to generate a random image, we sample $z$ from $p(z)$, which is a unit gaussian.</p>
+<p>This latent variable could be used in the decoder to produce a new image.</p>
+<h3 id="limits-of-vae">Limits of VAE</h3>
+<p>With the theory above, it seems that VAEs are perfect for generating images. They have a continuous and well-organized latent space, so why do they face challenges in practice?</p>
+<p>Here is a sample of faces generated by VAEs:</p>
+<p><img src="/vae/blurry-faces.png" alt=""></p>
+<p><!-- raw HTML omitted --><strong>All the images are blurry. Why?</strong><!-- raw HTML omitted --></p>
+<p>One explanation is that the ELBO loss function is unbalanced between <strong>KL</strong> divergence, which tries to fit the latent space to a normal distribution, and the <code>reconstruction loss</code> like MSE.
+Due to the stochasticity of the latent space during training, one sample could produce a distribution of slightly different $z$ values. Because of this difference, the reconstruction loss tries to average the variations, which is a mathematical model for blurriness.
+Thus, the model underfits sharper details.</p>
+<p>Moreover, the latent space produced is not flexible enough to generate precise outputs.</p>
+<p>Since the first VAE paper, many proposals for improving generation quality have been suggested.</p>
+<h3 id="beta-vae">$\beta$-VAE</h3>
+<p>An improvement of VAEs is to set a $\beta$ hyperparameter in the loss function to balance the reconstruction loss and <strong>KL</strong> divergence.
+This idea is proposed by <a href="https://openreview.net/forum?id=Sy2fzU9gl">Burgess et al. (2017)</a>. They propose a new form of the ELBO loss function:
+</p>
+$$\mathcal{L} = \mathcal{L}_\text{reconstruction} - \beta \cdot \textbf{KL}(q_\phi(z|x)|| p_\theta(z))$$<p>
+The reconstruction loss could be an <code>L2 loss</code>.</p>
+<p>If we choose $\beta > 1$, the distribution $q_\phi(z|x)$ is encouraged to match the prior $p_\theta(z)$, which is a unit Gaussian. Thus, the reconstruction loss has only a slight impact on the result, which helps avoid blurry images during generation. The main drawback is that it reduces the mutual information between a point $z$ and a point $x$.</p>
+<p>Moreover, $\beta$-VAE promotes the <code>disentanglement</code> of the latent space.</p>
+<p><!-- raw HTML omitted --><strong>What is a disentangled latent space?</strong><!-- raw HTML omitted -->
+The idea of a latent space is to produce a space with a smaller dimension than the data space. A latent space offers the possibility to encode data with a few parameters.</p>
+<p>For instance, an image of a circle could be encoded with 3 dimensions: the position of the center and the radius.
+Here, the latent space has two dimensions for the position and one for the radius.
+Now if we want to generate a circle, we could choose a center position and a radius.</p>
+<p>This is a <code>disentangled latent space</code>: each dimension represents a specific feature, and each feature is independent.</p>
+<p>However, standard VAEs do not produce <code>disentangled latent spaces</code>.
+The paper <a href="https://arxiv.org/abs/1804.03599">Understanding disentangling in $\beta$-VAE</a> explains why a $\beta > 1$ helps the disentanglement of the latent space.</p>
+<p>This paper proposes an analogy between VAEs and a noisy communication channel in information theory.
+The original image $x$ is the input, and the latent variable $z$ is the output.
+Thus, we want to estimate the <code>channel capacity</code> of a VAE:
+</p>
+$$C = \max\{I(x,z)\} \\ I(x,z) = \textbf{KL}[\mathbb{P}(x,z)|| \mathbb{P}(x) \cdot \mathbb{P}(z)]$$<p>The paper states that high capacity produces less regularization during training. Then, latent representations become more complex and do not produce independent latent channels. However, with a smaller capacity, we enforce higher regularization, which then produces independent latent channels.</p>
+<p>To balance the benefits of disentanglement with good reconstruction quality, Burgess et al. introduced a new training method for $\beta$-VAE.
+Since it is possible to control the capacity with the <strong>KL</strong> divergence, we apply high regularization in the first iterations, encouraging disentanglement in the early stages of training. Then we increase the capacity to capture details through the reconstruction loss.</p>
+<p>This leads to a new version of the loss function:
+</p>
+$$\mathcal{L} = \mathcal{L}_\text{reconstruction} - \gamma [\textbf{KL}(q_\phi(z|x)|| p_\theta(z)) - C]$$<p>
+The $\gamma$ is the new hyperparameter (previously called $\beta$) and $C$ is the channel capacity, which increases gradually.</p>
+<p><img src="/vae/capacity.png" alt=""></p>
+<p><!-- raw HTML omitted --><strong>Is there a quantitative link between low capacity and disentanglement?</strong><!-- raw HTML omitted --></p>
+<p><a href="https://arxiv.org/abs/1802.04942">Chen et al. (2018)</a> propose, in <em>Isolating sources of disentanglement in VAEs</em>, a decomposition of the <strong>KL</strong> divergence term as follows:
+</p>
+$$ \mathbb{E}[\textbf{KL}(q_\phi(z|x), p_\theta(z))] = \textbf{KL}[q_\phi(z,n)||q_\phi(z) \cdot p_\theta(n)] + \textbf{KL}[q_\phi(z)||\Pi_j q_\phi(z_j)] + \sum_j \textbf{KL}[q_\phi(z_j)||p_\theta(z_j)] \\ \mathbb{E}[\textbf{KL}(q_\phi(z|x), p_\theta(z))] = \text{image-latent mutual information} + \text{total correlation} + \text{KL dimension-wise}$$<p>This decomposition highlights that disentanglement is only a part of the <strong>KL</strong> divergence. This property is measured by the <code>total correlation</code> term.
+To target disentanglement, the authors propose the <code>\beta-TCVAE</code> (Total Correlation VAE), which sets hyperparameters in the loss function:
+</p>
+$$ \mathbb{E}[\textbf{KL}(q_\phi(z|x), p_\theta(z))] = \alpha \cdot \textbf{KL}[q_\phi(z,n)||q_\phi(z) \cdot p_\theta(n)] + \beta \cdot \textbf{KL}[q_\phi(z)||\Pi_j q_\phi(z_j)] + \gamma \cdot \sum_j \textbf{KL}[q_\phi(z_j)||p_\theta(z_j)]$$<h3 id="conditional-vae">Conditional VAE</h3>
+<p><code>Conditional VAE</code> (CVAE) proposes introducing multi-modality to generate more precise elements.</p>
+<p>With a classic VAE, we sample a random $z$ and generate an image using the decoder.</p>
+<p>But what if we want to generate a specific image?
+For instance, with the MNIST dataset, how do we proceed to generate a 6 or a 3?</p>
+<p><img src="/vae/unorganized_space.png" alt=""></p>
+<p>The contribution of the CVAE lies in the addition of a label $c$ during the training and generation steps.</p>
+<p><img src="/vae/cvae.png" alt="">
+The encoder and decoder are slightly modified to accept the image&rsquo;s label.
+The loss function is similar, given the label $c$:
+</p>
+$$\textbf{ELBO} = \mathbb{E_{q_\phi(z|x)}}(\log{p_\theta(x|z,c)})-\textbf{KL}(q_\phi(z|x,c)||p_\theta(z|c))$$<p>Thus, the generation step follows this principle:</p>
+<p><img src="/vae/cvae_gen.png" alt=""></p>
+<h3 id="vq-vae">VQ-VAE</h3>
+<p>VAEs generate a continuous normal distribution for data $x$ with the encoder. Then we sample a $z$ over this distribution and pass it through the decoder.</p>
+<p>However, the standard VAE framework ignores the potential sequential structures in the data.
+Moreover, for certain modalities like language, continuous posterior and prior distributions are not suitable.</p>
+<p>Here is the starting point of <a href="https://arxiv.org/pdf/1711.00937">van den Oord et al.</a> in the VQ-VAE paper.</p>
+<p>Their research focuses on the development of a VAE with a discrete latent space and an auto-regressive prior.</p>
+<p>This is the architecture proposed:
+<img src="/vae/vq-vae.png" alt=""></p>
+<p>They choose a cardinality $K$ for the discrete latent space and a dimension $D$ for the embeddings.</p>
+<p>The encoder works as in classic VAEs. The sampled $z_e$ is passed through the codebook, and a nearest-neighbor algorithm is applied.</p>
+<p>However, it is impossible to backpropagate a gradient through the codebook.
+The VQ-VAE paper chooses to skip this non-linearity and sends the gradient from the decoder&rsquo;s input to $z_e$.</p>
+<p>To train the codebook, a regularization term with a <code>skip-gradient</code> function is added. During backpropagation, this term is set to zero.</p>
+<p>The new loss function is:
+</p>
+$$\mathcal{L}_{\text{vq-vae}} = \mathcal{L}_{\text{reconstruction}}+||\text{sg}[z_e]-e||^2_2+\beta||z_e-\text{sg}[e]||^2_2$$<p>The regularization term $||\text{sg}[z_e]-e||^2_2+\beta||z_e-\text{sg}[e]||^2_2$ updates the discrete embeddings and attracts $z_e$ to the discrete embeddings to stabilize training.</p>
+<p>Once training is complete, they use an external auto-regressive model to fit a prior distribution $p$ over the latent space.</p>
+<p>Thus, the prior is not a simple Gaussian.</p>
+<h3 id="hierarchical-vae">Hierarchical VAE</h3>
+<p>So far, we have presented VAEs with only a single network.</p>
+<p>It is natural in deep learning to try a deep VAE. The goal could be to construct a latent space with increasing precision. This approach could help avoid blurriness in generation.</p>
+<p>Nevertheless, is it possible to build multi-level VAEs to achieve better results?</p>
+<p><img src="/vae/multi-vae.png" alt=""></p>
+<p>With a naive hierarchical VAE, posterior and generative distributions may differ without shared information between the encoder and decoder.</p>
+<p><a href="https://arxiv.org/pdf/1602.02282">Sonderby et al.</a> demonstrate that <code>Batch Normalization</code> and <code>Warm-up</code> (a technique which increases the importance of <strong>KL</strong> over epochs) improve the performance of naive hierarchical VAEs.</p>
+<p>To stabilize Hierarchical VAEs, Ladder VAE proposes coupling posterior and generative distributions. NVAE proposes using residual blocks and skip connections.</p>
+<p><!-- raw HTML omitted --><strong>Ladder VAE</strong>:<!-- raw HTML omitted --></p>
+<p><img src="/vae/lvae-paper.png" alt=""></p>
+<p>Sonderby et al. (2016) propose using the parameters of $p_\theta(x|z)$ at a layer $i$ to reparameterize the distribution $q_\phi(z|x)$ at layer $i$.</p>
+$$\begin{align*}
+q_\phi(\mathbf{z}|\mathbf{x}) &= q_\phi(z_L|\mathbf{x}) \prod_{i=1}^{L-1} q_\phi(z_i | z_{i+1}) \\[10pt]
+\sigma_{q,i} &= \frac{1}{\hat{\sigma}_{q,i}^{-2} + \sigma_{p,i}^{-2}} \\[10pt]
+\mu_{q,i} &= \frac{\hat{\mu}_{q,i} \hat{\sigma}_{q,i}^{-2} + \mu_{p,i} \sigma_{p,i}^{-2}}{\hat{\sigma}_{q,i}^{-2} + \sigma_{p,i}^{-2}} \\[10pt]
+q_\phi(z_i | \cdot) &= \mathcal{N}(z_i | \mu_{q,i}, \sigma_{q,i}^2)
+\end{align*}$$<p>As such, LVAE helps the encoder and decoder communicate together. The paper draws an analogy to a human analyzing an image. Natural perception involves back-and-forth processing between the real signal and brain signal.</p>
+<p><img src="/vae/lvae-performances.png" alt=""></p>
+<p>Finally, LVAE focuses training on each layer and produces a well-organized latent space.</p>
+<p>However, the datasets used in experiments with Ladder VAE are simple image datasets, like MNIST and OMNIGLOT, which contain symbols.</p>
+<p>Models like Nouveau VAE are tested on more complex tasks, such as image generation.</p>
+<p><!-- raw HTML omitted --><strong>Nouveau VAE</strong>:<!-- raw HTML omitted --></p>
+<p><img src="/vae/nvae-paper.png" alt=""></p>
+<p>NVAE (<a href="https://arxiv.org/pdf/2007.03898">Vahdat et al.</a>) proposes constructing a latent space with multi-level precision using residual cells.</p>
+<p>The residual cells in the encoder upcast the dimension of images to capture more detailed information with a 1x1 convolutional layer.</p>
+<p>To stabilize training, batch normalization and two additional techniques are used:</p>
+<ol>
+<li>
+<p>Reparameterization of $q$ at a level $l$ using information from the prior distribution. Let $p(z_l^i|z_{\lt l})$ be the prior of the $i$-th variable at layer $l$.</p>
+<p>We have $p(z_l^i|z_{\lt l}) \sim \mathcal{N}(\mu_i(z_{\lt l}), \sigma_i(z_{\lt l}))$.
+We denote $\Delta\mu_i$ and $\Delta\sigma_i$ as the relative parameters, which measure the difference between prior and posterior parameters.</p>
+<p>Now we have the posterior distribution:
+</p>
+$$q\left( z_l^i \middle| z_{\lt l}, \mathbf{x} \right) = \mathcal{N} \left( \mu_i(z_{\lt l}) + \Delta \mu_i(z_{\lt l}, \mathbf{x}), \, \sigma_i(z_{\lt l}) \cdot \Delta \sigma_i(z_{\lt l}, \mathbf{x}) \right)$$</li>
+<li>
+<p>Spectral regularization: A regularization term is added to the loss function: </p>
+$$\mathcal{L}_\text{SR} = \lambda \Sigma_i s^{(i)}$$<p>
+Where $s^{(i)}$ is the largest singular value of the $i$-th layer, and $\lambda$ is a hyperparameter.</p>
+</li>
+</ol>
+<p>The final loss is:
+</p>
+$$\mathcal{L}_{\text{VAE}}(x) = 
+\mathbb{E}_{q(z|x)} \left[ \log p(x|z) \right] - \text{KL}\left(q(z_1|x) || p(z_1)\right) - \sum_{l=2}^{L} \mathbb{E}_{q(z_{\lt l}|\mathbf{x})} \left[\text{KL}\left(q(z_l|\mathbf{x}, z_{\lt l}) \parallel p(z_l|z_{\lt l})\right)\right] + \mathcal{L}_\text{SR}$$<h2 id="conclusion">Conclusion</h2>
+<p>We have seen that Variational Inference methods help us approximate distributions by minimizing the Evidence Lower Bound using the Kullback-Leibler divergence and algorithms like CAVI or BBVI. VI introduces tricks to compute gradients efficiently, such as the log-derivative trick or reparameterization trick.</p>
+<p>In generative deep learning, VI allows us to construct stochastic latent spaces, which are more continuous than deterministic latent spaces.</p>
+<p>This leads to models such as Variational Auto-Encoders. These kinds of models have limited generation capacity compared to auto-regressive models or GANs.</p>
+<p>However, modifications to the architectures and loss functions help VAE-like models become competitive, state-of-the-art models in data generation.</p>
+<p>Moreover, VAE-like models produce a latent space, not just a black-box generator. These models are suitable for encoding tasks.</p>
+<p>This article is the first stage of a project in my final year of engineering studies. I will study the training of NVAE and then use it to improve cardiac shape segmentation.</p>
+<h3 id="bibliographies">Bibliographies</h3>
+<p>[1] :
+[2] :
+[3] :
+[4] :
+[5] :</p>
+<p><!-- raw HTML omitted -->Alexandre MYARA - Oct 2024<!-- raw HTML omitted --></p>
+</div>
+    </article>
+
+    
+</body>
+</html>

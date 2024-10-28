@@ -1,0 +1,17 @@
+baseURL: https://example.org/
+languageCode: en-us
+title: Alexandre MYARA
+markup:
+  goldmark:
+    extensions:
+      passthrough:
+        delimiters:
+          block:
+            - - '$$'
+              - '$$'
+          inline:
+            - - '$'
+              - '$'
+        enable: true
+params:
+  math: true
