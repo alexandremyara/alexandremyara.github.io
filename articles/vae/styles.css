@@ -1,0 +1,58 @@
+body{
+    width:auto;
+    height:auto;
+    font-family: "Segoe UI";
+    overflow-x: hidden;
+}
+
+img {
+    display: block;
+    max-width: 100%; /* Ensures the image doesn’t exceed the width of its container */
+    height: auto;    /* Maintains the aspect ratio */
+    object-fit: contain;
+}
+
+
+section {
+    margin-left:20%;
+    margin-right:20%;
+
+}
+
+h1 {
+    /*color:#D9730D;
+    text-align: center;*/
+    font-size: 30px;
+
+}
+h2 {
+    color:#337EA9;
+}
+h3 {
+    color:#448361;
+}
+
+a {
+    text-decoration: none;
+    color:#337EA9;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+}
+
+th {
+    background-color: #333;
+    color: white;
+}

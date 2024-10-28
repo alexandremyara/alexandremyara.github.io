@@ -1,0 +1,122 @@
+body {
+    font-family: Arial, sans-serif;
+    margin-top: 50px;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: black;
+}
+
+#presentation{
+    margin-top:0;
+}
+
+p{
+    margin-left : 20px;
+    font-size: 16px;
+    line-height: 1.5;
+}
+h1 {
+    margin:0;
+    margin-left: 20px;
+    font-size: 40px;
+    font-weight: normal;
+}
+
+h2 {
+    margin: 0;
+    margin-top: 5px;
+    margin-left: 20px;
+    font-size: 18px;
+    font-weight: lighter;
+    color: #666;
+}
+#presentation{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.presentation-title{
+    margin-left : -20px;
+}
+
+.presentation-container {
+    display: flex;
+    align-items: flex-start; /* Aligner l'image et le texte en haut */
+    gap: 20px; /* Ajouter un espace entre l'image et le texte */
+    margin-top: 20px;
+    /*margin-left: 20px;*/
+}
+.presentation-container p {
+    flex: 1; /* Le paragraphe prend tout l'espace restant */
+    margin-top: -7px; /* Supprimer les marges par défaut si nécessaire */
+}
+img {
+    object-fit: cover;
+    float: left;
+    width: 250px;
+    height: 200px;
+    margin-top:0;
+    margin-right: 10px;
+}
+
+section {
+    padding: 20px;
+    max-width: 800px;
+    margin: auto;
+}
+
+#articles h2 {
+    text-align: center;
+    margin-top: 40px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+}
+
+th {
+    background-color: #333;
+    color: white;
+}
+
+li{
+    line-height: 1.6;
+}
+#cv h2 {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.course_description{
+    margin-left: 50px;
+}
+
+a {
+    color: #0066cc;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #333;
+    color: white;
+    width: 100%;
+    bottom: 0;
+}
