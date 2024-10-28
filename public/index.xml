@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Alexandre MYARA</title>
+    <link>http://localhost:1313/</link>
+    <description>Recent content on Alexandre MYARA</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 28 Oct 2024 07:07:07 +0100</lastBuildDate>
+    <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>VAE</title>
+      <link>http://localhost:1313/posts/vae_blog_en/</link>
+      <pubDate>Mon, 28 Oct 2024 07:07:07 +0100</pubDate>
+      <guid>http://localhost:1313/posts/vae_blog_en/</guid>
+      <description>&lt;h1 id=&#34;from-variational-inference-to-variationnal-auto-encoder-vae-and-more&#34;&gt;From Variational Inference to Variationnal Auto Encoder (VAE) and more&lt;/h1&gt;&#xA;&lt;p&gt;In recent articles on data generation, the state of the art appears to be achieved by models based on the &lt;code&gt;Variationnal Auto Encoder&lt;/code&gt;.&#xA;To understand this model, we need to delve into two key concepts: &lt;code&gt;Variationnal Inference&lt;/code&gt; (VI) and &lt;code&gt;Auto Encoder&lt;/code&gt; (AE).&lt;/p&gt;&#xA;&lt;h4 id=&#34;summary&#34;&gt;&lt;strong&gt;Summary&lt;/strong&gt;&lt;/h4&gt;&#xA;&lt;h5 id=&#34;i-variational-inference--elbo-cavi-and-bbvi&#34;&gt;I. Variational Inference : ELBO, CAVI and BBVI&lt;/h5&gt;&#xA;&lt;h5 id=&#34;ii-auto-encoders--theory-and-applications&#34;&gt;II. Auto-Encoders : Theory and applications&lt;/h5&gt;&#xA;&lt;h5 id=&#34;iii-varitional-auto-encoders--vae-beta-vae-cvae-vq-vae-hierarchical-vae&#34;&gt;III. Varitional Auto-Encoders : VAE, $\beta$-VAE, CVAE, VQ-VAE, Hierarchical VAE&lt;/h5&gt;&#xA;&lt;h3 id=&#34;context&#34;&gt;Context&lt;/h3&gt;&#xA;&lt;p&gt;Consider a dataset $\mathcal{D}$ of images, where $x$ denotes a unique sample of $\mathcal{D}$.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>How to Construct Multimodal Datasets Efficiently?</title>
+      <link>http://localhost:1313/posts/dataset_blog_en/</link>
+      <pubDate>Thu, 01 Aug 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/dataset_blog_en/</guid>
+      <description>&lt;h1 id=&#34;the-importance-of-the-dataset&#34;&gt;The Importance of the Dataset&lt;/h1&gt;&#xA;&lt;p&gt;&lt;img src=&#34;http://localhost:1313/image/dataset/image-3.png&#34; alt=&#34;alt text&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;When tackling a deep learning problem, it&amp;rsquo;s common to instinctively modify an existing architecture to fit the task or even consider designing a new one from scratch.&lt;/p&gt;&#xA;&lt;p&gt;As highlighted in &lt;a href=&#34;https://nonint.com/2023/06/10/the-it-in-ai-models-is-the-dataset/&#34;&gt;The &amp;lsquo;it&amp;rsquo; in AI models is the dataset&lt;/a&gt;, the most significant lever to improve deep learning models relies in the training data rather than the architecture itself. Having data that is well-suited to a precise use case can significantly improve performance of the model for this use case.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title></title>
+      <link>http://localhost:1313/posts/vqa/vqa_fr/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/vqa/vqa_fr/</guid>
+      <description>&lt;h1 id=&#34;evolutions-des-méthodes-de-visual-question-answering&#34;&gt;Evolutions des méthodes de Visual Question Answering&lt;/h1&gt;</description>
+    </item>
+  </channel>
+</rss>

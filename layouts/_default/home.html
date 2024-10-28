@@ -1,0 +1,98 @@
+{{define "main"}}
+
+    <!-- Section de présentation avec photo à gauche -->
+    <section id="presentation">
+        <div class="presentation-title">
+            <h1>Alexandre Myara</h1>
+            <h2>Deep Learning student @ Telecom Paris</h2>
+        </div>
+        <div class="presentation-container">
+                <img src="/image/index/photo-alexandre-myara.png" alt="Photo d'Alexandre Myara">
+
+                <p>
+                    Hello there ! I am in my last year of AI engineering study at <a href="https://www.telecom-paris.fr/fr/masteres-specialises/formation-intelligence-artificielle">Telecom ParisTech</a> in MS AI where I am studing
+                    deep learning (mainly NLP and Computer Vision). <br>
+                    At the same time, I follow NLP and medical imaging courses at <a href="https://www.master-mva.com/">ENS Paris Saclay</a> 
+                    in the Master of Science MVA (Mathematic Vision Apprentissage).<br>
+                    I am curently working on a project of image generation for semantic segmentation of cardiac radiographies with Telecom Paris Deep Learning Departement.<br>
+                    In parallel, I am seeking a 6 months internship in deep learning applied in biology or in medical domains.
+                </p>
+        </div>
+    </section>
+
+    <!-- Section Articles -->
+    <section id="articles">
+        <h2>Articles</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><a href="http://localhost:1313/posts/vae_blog_en/">Understand image generation with VAE</a></td>
+                    <td>Oct 2024</td>
+                </tr>
+                <tr>
+                    <td><a href="http://localhost:1313/posts/dataset_blog_en/">How to construct multimodal datasets effeciently ?</a></td>
+                    <td>Aug 2024</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- Section CV -->
+    <section id="cv">
+        <h2>
+            CV
+        </h2>
+        <!-- Sous section Education du CV -->
+        <section id="education">
+            <h3>
+                Education
+            </h3>
+                <ul>
+                    <li>
+                        <b>ENS Paris Saclay - MVA </b> - 2024/2025
+                        <div class="course_description">
+                            ALTEGRAD (NLP), Medical Image Analysis, learning for protein science, Deep Learning for medical imaging
+                        </div>
+                    </li>
+                    <li>
+                        <b>Télécom Paris - MS IA (3rd year engineer)</b> - 2024/2025
+                        <div class="course_description">
+                            Deep Learning, NLP, Advancend Probabilities, Reinforcement Learning.
+                        </div>
+                    </li>
+                    <li>
+                        <b>Polytechnique Montréal - AI Track</b> - 2023/2024
+                        <div class="course_description">
+                            NLP, Image Analysis, Machine Learning, Mathematics for Deep Learning
+                        </div>
+                    </li>
+                    <li>
+                        <b>Télécom SudParis - 1st and 2nd year engineer</b> - 2022/2024
+                        <div class="course_description">
+                            Signal Processing, Image Analysis, Java, Software Developpement, <br>
+                            Machine Learning, Complexe Analysis, Probabilities and Statistics
+                        </div>
+                    </li>
+                </ul>
+        </section>
+
+        <!-- Sous section Projet du CV -->
+        <section id="project">
+            <h3>
+                Project
+            </h3>
+            <p>
+                NVAE and 
+                Semantic segmentation of tumors on MRI via UnET/ViT (Brats Dataset).<br>
+                ResNet fine-tuning for Covid-19 detection on chest x-ray. <br>
+                Kaggle Competition : Machine Learning and image classification <br>
+            </p>
+        </div>
+    </section>
+{{end}}

@@ -1,0 +1,13 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="{{ .Description }}">
+
+<link rel="icon" type="image/png" href="icon/icon.png">
+<title>{{ .Title}}</title>
+
+
+{{if .IsHome}}
+    <link rel="stylesheet" href="{{ "css/index.css" |relURL}}">
+{{else if eq .Type "posts"}}
+    <link rel="stylesheet" href="{{ "css/posts.css" |relURL}}">
+{{end}}
