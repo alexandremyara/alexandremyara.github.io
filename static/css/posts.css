@@ -1,11 +1,31 @@
-body{
-    width:auto;
-    height:auto;
+body {
+    width: auto;
+    height: auto;
     font-family: "Segoe UI";
     overflow-x: hidden;
-    margin-left:20%;
-    margin-right:20%;
+    margin: 0 15%;
     margin-top: -100px;
+    box-sizing: border-box;
+}
+
+@media (max-width: 1200px) {
+    body {
+        margin-left: 10%;
+        margin-right: 10%;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        margin-left: 5%;
+        margin-right: 5%;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        margin: 2%;
+    }
 }
 
 img {
@@ -15,36 +35,37 @@ img {
     object-fit: contain;
 }
 
-code{
-    background-color: #e3e0e0;   /* Surlignage en gris */
-
-    border-radius: 3px;           /* Bords arrondis */
+code {
+    background-color: #e3e0e0;
+    border-radius: 3px;
     padding-top: 2px;
-    box-sizing: border-box;        /* Inclure padding dans la largeur totale */
+    box-sizing: border-box;
 }
-h1 {
-    /*color:#D9730D;
-    text-align: center;*/
-    font-size: 30px;
 
+h1 {
+    font-size: 2em;
 }
+
 h2 {
-    color:#337EA9;
+    color: #337EA9;
     padding-bottom: 1%;
     padding-top: 10%;
-    font-size: 40px;
-}
-h3 {
-    color:#448361;
-    padding-top: 2%;
-    font-size : 28px;
+    font-size: 1.8em;
 }
 
-p{padding-top:2%;}
+h3 {
+    color: #448361;
+    padding-top: 2%;
+    font-size: 1.5em;
+}
+
+p {
+    padding-top: 2%;
+}
 
 a {
     text-decoration: none;
-    color:#337EA9;
+    color: #337EA9;
 }
 
 table {
@@ -68,17 +89,16 @@ th {
 }
 
 .conclusionBlock {
-    border: 1px solid #db6262;   /* Bordure grise */
-    padding: 15px;               /* Espacement interne */
+    border: 1px solid #db6262;
+    padding: 15px;
     padding-top: 0px;
-    border-radius: 5px;          /* Coins arrondis */
-    background-color: #f9f9f9;   /* Fond léger gris */
-    max-width: 100%;             /* Assure la réactivité */
-    box-sizing: border-box;      /* Inclut la bordure et le padding */
-    margin: 15px auto;           /* Centrer et espacer l’encadré */
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    max-width: 100%;
+    box-sizing: border-box;
+    margin: 15px auto;
 }
 
-/* Styles responsive */
 @media (max-width: 768px) {
     .conclusionBlock {
         padding: 10px;
@@ -88,7 +108,7 @@ th {
 @media (max-width: 480px) {
     .conclusionBlock {
         padding: 8px;
-        font-size: 0.9em;       /* Ajuste la taille du texte */
+        font-size: 0.9em;
     }
 }
 
@@ -96,23 +116,43 @@ th {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 1em auto; /* centre la figure sur la page */
-    max-width: 100%; /* s'assure que la figure ne dépasse pas la largeur de la page */
-  }
-  
-  .figure img {
-    max-width: 100%; /* image responsive */
+    margin: 1em auto;
+    max-width: 100%;
+}
+
+.figure img {
+    max-width: 100%;
     height: auto;
     border-radius: 4px;
-  }
-  
-  .figure-caption {
-    font-size: 13px;
+}
+
+.figure-caption {
+    font-size: 0.8em;
     color: #555;
     margin-top: 0.5em;
     font-style: italic;
     text-align: center;
-    margin-bottom: 1.5em; /* ajoute un espace après la légende */
-  }
-  
-  
+    margin-bottom: 1.5em;
+}
+
+/* Styles pour les formules KaTeX en mode display uniquement */
+.katex-display {
+    display: block;
+    max-width: 100%;      /* S'assure que les formules ne dépassent pas la largeur de l'écran */
+    overflow-x: auto;     /* Active un défilement horizontal si nécessaire */
+    white-space: nowrap;  /* Empêche les formules de se casser */
+}
+
+@media (max-width: 768px) {
+    .katex-display {
+        font-size: 0.9em;  /* Taille ajustée pour écrans moyens */
+    }
+}
+
+@media (max-width: 480px) {
+    .katex-display {
+        font-size: 0.8em;           /* Taille réduite pour petits écrans */
+        transform: scale(0.9);       /* Échelle de réduction supplémentaire */
+        transform-origin: left top;  /* Maintient l’alignement à gauche */
+    }
+}

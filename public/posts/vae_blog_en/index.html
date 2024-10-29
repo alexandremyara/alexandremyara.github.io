@@ -41,13 +41,13 @@
     
     
     <article>
-        <div><h1 id="from-variational-inference-to-variationnal-auto-encoder-vae-and-more">From Variational Inference to Variationnal Auto Encoder (VAE) and more</h1>
-<p>In recent articles about data generation, the state of the art appears to be achieved by models based on the <code>Variationnal Auto Encoder</code>.
-To understand this model, we need to delve into two key concepts: <code>Variationnal Inference</code> (VI) and <code>Auto Encoder</code> (AE).</p>
+        <div><h1 id="from-variational-inference-to-variational-auto-encoder-vae-and-more">From Variational Inference to Variational Auto Encoder (VAE) and more</h1>
+<p>In recent articles about data generation, the state of the art appears to be achieved by models based on the <code>Variational Auto Encoder</code>.
+To understand this model, we need to delve into two key concepts: <code>Variational Inference</code> (VI) and <code>Auto Encoder</code> (AE).</p>
 <h4 id="summary"><strong>Summary</strong></h4>
 <h5 id="i-variational-inference--elbo-cavi-and-bbvi">I. Variational Inference : ELBO, CAVI and BBVI</h5>
 <h5 id="ii-auto-encoders--theory-and-applications">II. Auto-Encoders : Theory and applications</h5>
-<h5 id="iii-varitional-auto-encoders--vae-beta-vae-cvae-vq-vae-hierarchical-vae">III. Varitional Auto-Encoders : VAE, $\beta$-VAE, CVAE, VQ-VAE, Hierarchical VAE</h5>
+<h5 id="iii-variational-auto-encoders--vae-beta-vae-cvae-vq-vae-hierarchical-vae">III. Variational Auto-Encoders : VAE, $\beta$-VAE, CVAE, VQ-VAE, Hierarchical VAE</h5>
 <h3 id="context">Context</h3>
 <p>Consider a dataset $\mathcal{D}$ of images, where $x$ denotes a unique sample of $\mathcal{D}$.</p>
 <p>Our goal is to build a model capable of generating new images, specifically images that are not in $\mathcal{D}$.</p>
@@ -58,9 +58,9 @@ To understand this model, we need to delve into two key concepts: <code>Variatio
 </p>
 $$p_\theta(x)=\frac {p_\theta(z,x)}{p(z|x)}$$<p>Good news : $p_\theta(z,x)$ is tractable.
 Bad news : $p_\theta(z|x)$ is untractable.</p>
-<p><strong>The final idea is to approximate $p_\theta(z|x)$ with optimization methods (Variationnal Inference) then to construct a model based on this approximate distribution: the Variational Auto-Encoder.</strong></p>
-<h2 id="i-varitional-inference-vi">I. Varitional Inference-VI</h2>
-<p><code>Variationnal Inference</code> is a branch of statistics that aims to approximate an unknown distribution using known distributions  $\{q_{\phi}\}$. One approach to approximate the unknown distribution is by adjusting $\phi$, the parameter of the known distribution..</p>
+<p><strong>The final idea is to approximate $p_\theta(z|x)$ with optimization methods (Variational Inference) then to construct a model based on this approximate distribution: the Variational Auto-Encoder.</strong></p>
+<h2 id="i-variational-inference-vi">I. Variational Inference-VI</h2>
+<p><code>Variational Inference</code> is a branch of statistics that aims to approximate an unknown distribution using known distributions  $\{q_{\phi}\}$. One approach to approximate the unknown distribution is by adjusting $\phi$, the parameter of the known distribution..</p>
 <p>For example, if you want to approximate a given distribution using a Gaussian family, you need to adjust $\mu$ and $\sigma$ so that your gaussian distribution $q_{\mu,\sigma}$ closely matches the target distribution.
 
   <figure class="figure">
@@ -81,13 +81,13 @@ Bad news : $p_\theta(z|x)$ is untractable.</p>
 <p>In order to <strong>estimate a posterior</strong>, we have data $x \in \mathcal D$.</p>
 <p>We consider a latent space $Z$.
 Then we choose distribution family $\mathcal Q$ for $q_\phi(z|x)$(the approximate posterior).</p>
-<p>As a result, a <code>Varitional Inference</code> (VI) problem with <code>KL-divergence</code> as a metric is formulated as :
+<p>As a result, a <code>Variational Inference</code> (VI) problem with <code>KL-divergence</code> as a metric is formulated as :
 </p>
 $$ \argmin_{q_\phi\in \mathcal Q} \textbf{KL}(q_\phi(z|x)||p_\theta(z|x))$$<p>
 With expectation manipulations and Bayes rule the <code>KL</code> become :</p>
 <p>$\textbf{KL}(q_\phi(z|x)||p_\theta(z|x))=$<!-- raw HTML omitted -->$\mathbb{E_{q_\phi(z|x)}}(\log{p_\theta(x|z)}.p_\theta(z))-\mathbb{E_{q_\phi(z|x)}}(\log{q_\phi(x|z)})$<!-- raw HTML omitted -->+$\log{p_\theta(x)}$</p>
 <p>$\textbf{KL}(q_\phi(z|x)||p_\theta(z|x))=$-<!-- raw HTML omitted -->$\textbf{ELBO}$<!-- raw HTML omitted -->+$\log{p_\theta(x)}$</p>
-<p>Maximise <!-- raw HTML omitted -->the red box<!-- raw HTML omitted --> is equivalent to minimize the <code>KL</code>.
+<p>Maximise <!-- raw HTML omitted -->the red box<!-- raw HTML omitted --> is equivalent to minimise the <code>KL</code>.
 This quantity, in the red box, is the <code>ELBO</code> (Evidence Lower Bound).
 </p>
 $$\textbf{ELBO}=\mathbb{E_{q_\phi(z|x)}}(\log{q_\phi(z|x)})-\mathbb{E_{q_\phi(z|x)}}(\log{p_\theta(x|z)}.p_\theta(z))$$<p>Another form for the ELBO, more suited to machine learning formulation, is :
@@ -531,10 +531,10 @@ $$\mathcal{L}_{\text{VAE}}(x) =
 
 </div>
 <p>This article is the first stage of a project in my final year of engineering studies. I will study the training of NVAE and then use it to improve cardiac shape segmentation.</p>
-<h3 id="bibliographies">Bibliographies</h3>
-<p>[1] : David M. Blei, Alp Kucukelbir, Jon D. McAuliffe (2018), <a href="https://arxiv.org/pdf/1601.00670">Varitional Inference : a review for statisticians</a></p>
+<h3 id="bibliography">Bibliography</h3>
+<p>[1] : David M. Blei, Alp Kucukelbir, Jon D. McAuliffe (2018), <a href="https://arxiv.org/pdf/1601.00670">Variational Inference : a review for statisticians</a></p>
 <p>[2] : Kaiwen Wu, Jacob R. Gardner (2024), <a href="https://arxiv.org/html/2406.01870v1">Understanding Stochastic Natural Gradient Variational Inference</a></p>
-<p>[3] : Matt Hoffman, David M. Blei, Chong Wang, John Paisley (2013), <a href="https://arxiv.org/pdf/1206.7051">Stochastic Varitional Inference</a></p>
+<p>[3] : Matt Hoffman, David M. Blei, Chong Wang, John Paisley (2013), <a href="https://arxiv.org/pdf/1206.7051">Stochastic Variational Inference</a></p>
 <p>[4] : Sushant Patrickar, Medium article 2019, <a href="https://towardsdatascience.com/batch-mini-batch-stochastic-gradient-descent-7a62ecba642a">Batch, Mini Batch &amp; Stochastic Gradient Descent</a></p>
 <p>[5] : David Wingate, Theo Weber (2013), <a href="https://arxiv.org/pdf/1301.1299">Automated Variational Inference
 in Probabilistic Programming</a></p>
