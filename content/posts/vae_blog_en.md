@@ -15,7 +15,7 @@ To understand this model, we need to delve into two key concepts: ``Variational 
 
 ##### II. Auto-Encoders : Theory and applications
 
-##### III. Varitional Auto-Encoders : VAE, $\beta$-VAE, CVAE, VQ-VAE, Hierarchical VAE
+##### III. Variational Auto-Encoders : VAE, $\beta$-VAE, CVAE, VQ-VAE, Hierarchical VAE
 
 ### Context
 Consider a dataset $\mathcal{D}$ of images, where $x$ denotes a unique sample of $\mathcal{D}$.
@@ -37,7 +37,7 @@ Bad news : $p_\theta(z|x)$ is untractable.
 **The final idea is to approximate $p_\theta(z|x)$ with optimization methods (Variational Inference) then to construct a model based on this approximate distribution: the Variational Auto-Encoder.**
 
 
-## I. Varitional Inference-VI
+## I. Variational Inference-VI
 `Variational Inference` is a branch of statistics that aims to approximate an unknown distribution using known distributions  $\{q_{\phi}\}$. One approach to approximate the unknown distribution is by adjusting $\phi$, the parameter of the known distribution..
 
 For example, if you want to approximate a given distribution using a Gaussian family, you need to adjust $\mu$ and $\sigma$ so that your gaussian distribution $q_{\mu,\sigma}$ closely matches the target distribution.
@@ -62,7 +62,7 @@ In order to **estimate a posterior**, we have data $x \in \mathcal D$.
 We consider a latent space $Z$.
 Then we choose distribution family $\mathcal Q$ for $q_\phi(z|x)$(the approximate posterior).
 
-As a result, a ``Varitional Inference`` (VI) problem with ``KL-divergence`` as a metric is formulated as :
+As a result, a ``Variational Inference`` (VI) problem with ``KL-divergence`` as a metric is formulated as :
 $$ \argmin_{q_\phi\in \mathcal Q} \textbf{KL}(q_\phi(z|x)||p_\theta(z|x))$$
 With expectation manipulations and Bayes rule the ``KL`` become :
 
@@ -586,11 +586,11 @@ This article is the first stage of a project in my final year of engineering stu
 
 
 ### Bibliography
-[1] : David M. Blei, Alp Kucukelbir, Jon D. McAuliffe (2018), [Varitional Inference : a review for statisticians](https://arxiv.org/pdf/1601.00670)
+[1] : David M. Blei, Alp Kucukelbir, Jon D. McAuliffe (2018), [Variational Inference : a review for statisticians](https://arxiv.org/pdf/1601.00670)
 
 [2] : Kaiwen Wu, Jacob R. Gardner (2024), [Understanding Stochastic Natural Gradient Variational Inference](https://arxiv.org/html/2406.01870v1)
 
-[3] : Matt Hoffman, David M. Blei, Chong Wang, John Paisley (2013), [Stochastic Varitional Inference](https://arxiv.org/pdf/1206.7051)
+[3] : Matt Hoffman, David M. Blei, Chong Wang, John Paisley (2013), [Stochastic Variational Inference](https://arxiv.org/pdf/1206.7051)
 
 [4] : Sushant Patrickar, Medium article 2019, [Batch, Mini Batch & Stochastic Gradient Descent](https://towardsdatascience.com/batch-mini-batch-stochastic-gradient-descent-7a62ecba642a)
 
