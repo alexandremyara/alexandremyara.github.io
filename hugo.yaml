@@ -13,5 +13,12 @@ markup:
             - - '$'
               - '$'
         enable: true
+  markdownit:
+    enable: true
+    extensions:
+      - markdown-it-implicit-figures
+    config:
+      linkify: true
+      typographer: true
 params:
   math: true

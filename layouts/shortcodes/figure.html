@@ -1,0 +1,8 @@
+{{ if .Inner }}
+  <figure class="figure">
+    {{ .Inner | markdownify }}
+    <figcaption class="figure-caption">{{ .Get "caption" }}</figcaption>
+  </figure>
+{{ else }}
+  {{ .Inner | markdownify }}
+{{ end }}
