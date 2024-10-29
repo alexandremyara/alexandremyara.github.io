@@ -5,9 +5,9 @@ draft : false
 showReadingTime : true
 showPostNavLinks : true
 ---
-# From Variational Inference to Variationnal Auto Encoder (VAE) and more
-In recent articles about data generation, the state of the art appears to be achieved by models based on the ``Variationnal Auto Encoder``.
-To understand this model, we need to delve into two key concepts: ``Variationnal Inference`` (VI) and ``Auto Encoder`` (AE).
+# From Variational Inference to Variational Auto Encoder (VAE) and more
+In recent articles about data generation, the state of the art appears to be achieved by models based on the ``Variational Auto Encoder``.
+To understand this model, we need to delve into two key concepts: ``Variational Inference`` (VI) and ``Auto Encoder`` (AE).
 
 #### **Summary**
 
@@ -34,11 +34,11 @@ $$p_\theta(x)=\frac {p_\theta(z,x)}{p(z|x)}$$
 Good news : $p_\theta(z,x)$ is tractable.
 Bad news : $p_\theta(z|x)$ is untractable.
 
-**The final idea is to approximate $p_\theta(z|x)$ with optimization methods (Variationnal Inference) then to construct a model based on this approximate distribution: the Variational Auto-Encoder.**
+**The final idea is to approximate $p_\theta(z|x)$ with optimization methods (Variational Inference) then to construct a model based on this approximate distribution: the Variational Auto-Encoder.**
 
 
 ## I. Varitional Inference-VI
-`Variationnal Inference` is a branch of statistics that aims to approximate an unknown distribution using known distributions  $\{q_{\phi}\}$. One approach to approximate the unknown distribution is by adjusting $\phi$, the parameter of the known distribution..
+`Variational Inference` is a branch of statistics that aims to approximate an unknown distribution using known distributions  $\{q_{\phi}\}$. One approach to approximate the unknown distribution is by adjusting $\phi$, the parameter of the known distribution..
 
 For example, if you want to approximate a given distribution using a Gaussian family, you need to adjust $\mu$ and $\sigma$ so that your gaussian distribution $q_{\mu,\sigma}$ closely matches the target distribution.
 {{<figure caption="Figure 1 - Approximation of a target gaussian by adjusting an other gaussian's parameters.">}}
