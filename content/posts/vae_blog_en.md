@@ -380,7 +380,7 @@ Since the first VAE paper, many proposals for improving generation quality have 
 
 ### $\beta$-VAE
 An improvement of VAEs is to set a $\beta$ hyperparameter in the loss function to balance the reconstruction loss and **KL** divergence.
-This idea is proposed by [Burgess et al. (2017)](https://openreview.net/forum?id=Sy2fzU9gl). They propose a new form of the ELBO loss function:
+This idea is proposed by [Higgins et al. (2017)](https://openreview.net/forum?id=Sy2fzU9gl). They propose a new form of the ELBO loss function:
 $$\mathcal{L} = \mathcal{L}_\text{reconstruction} - \beta \cdot \textbf{KL}(q_\phi(z|x)|| p_\theta(z))$$
 The reconstruction loss could be an ``L2 loss``.
 
@@ -407,7 +407,7 @@ $$C = \max\{I(x,z)\} \\ I(x,z) = \textbf{KL}[\mathbb{P}(x,z)|| \mathbb{P}(x) \cd
 
 The paper states that high capacity produces less regularization during training. Then, latent representations become more complex and do not produce independent latent channels. However, with a smaller capacity, we enforce higher regularization, which then produces independent latent channels.
 
-To balance the benefits of disentanglement with good reconstruction quality, Burgess et al. introduced a new training method for $\beta$-VAE.
+To balance the benefits of disentanglement with good reconstruction quality, Higgins et al. introduced a new training method for $\beta$-VAE.
 Since it is possible to control the capacity with the **KL** divergence, we apply high regularization in the first iterations, encouraging disentanglement in the early stages of training. Then we increase the capacity to capture details through the reconstruction loss.
 
 This leads to a new version of the loss function:
@@ -557,10 +557,26 @@ This article is the first stage of a project in my final year of engineering stu
 
 
 ### Bibliographies
-[1] :
-[2] :
-[3] :
-[4] :
-[5] :
+[1] : David M. Blei, Alp Kucukelbir, Jon D. McAuliffe (2018), [Varitional Inference : a review for statisticians](https://arxiv.org/pdf/1601.00670)
+
+[2] : Kaiwen Wu, Jacob R. Gardner (2024), [Understanding Stochastic Natural Gradient Variational Inference](https://arxiv.org/html/2406.01870v1)
+
+[3] : Matt Hoffman, David M. Blei, Chong Wang, John Paisley (2013), [Stochastic Varitional Inference](https://arxiv.org/pdf/1206.7051)
+
+[4] : Sushant Patrickar, Medium article 2019, [Batch, Mini Batch & Stochastic Gradient Descent](https://towardsdatascience.com/batch-mini-batch-stochastic-gradient-descent-7a62ecba642a)
+
+[5] : David Wingate, Theo Weber (2013), [Automated Variational Inference
+in Probabilistic Programming](https://arxiv.org/pdf/1301.1299)
+
+[6] : Diederik P. Kingma, Tim Salimans, Max Welling (2015), [Variational Dropout and
+the Local Reparameterization Trick](https://arxiv.org/pdf/1506.02557)
+
+[7] : Irina Higgins, Loic Matthey, Arka Pal, Christopher Burgess, Xavier Glorot, Matthew Botvinick, Shakir Mohamed, Alexander Lerchner (2017), [beta-VAE: Learning Basic Visual Concepts with a Constrained Variational Framework](https://openreview.net/forum?id=Sy2fzU9gl)
+
+[8] : Christopher P. Burgess, Irina Higgins, Arka Pal, Loic Matthey, Nick Watters, Guillaume Desjardins, Alexander Lerchner (2018), [Understanding disentangling in β-VAE](https://arxiv.org/abs/1804.03599)
+
+[10] : Aaron van den Oord, Oriol Vinyals, Koray Kavukcuoglu (2018), [Neural Discrete Representation Learning](https://arxiv.org/pdf/1711.00937)
+
+[11] : Arash Vahdat, Jan Kautz (2021), [NVAE: A Deep Hierarchical Variational Autoencoder](https://arxiv.org/pdf/2007.03898)
 
 <span style="font-size: 12px">Alexandre MYARA - Oct 2024</span>
