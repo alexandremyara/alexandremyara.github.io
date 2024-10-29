@@ -32,10 +32,12 @@ h2 {
     color:#337EA9;
     padding-bottom: 1%;
     padding-top: 10%;
+    font-size: 40px;
 }
 h3 {
     color:#448361;
     padding-top: 2%;
+    font-size : 28px;
 }
 
 p{padding-top:2%;}
@@ -63,4 +65,29 @@ th, td {
 th {
     background-color: #333;
     color: white;
+}
+
+.conclusionBlock {
+    border: 1px solid #db6262;   /* Bordure grise */
+    padding: 15px;               /* Espacement interne */
+    padding-top: 0px;
+    border-radius: 5px;          /* Coins arrondis */
+    background-color: #f9f9f9;   /* Fond léger gris */
+    max-width: 100%;             /* Assure la réactivité */
+    box-sizing: border-box;      /* Inclut la bordure et le padding */
+    margin: 15px auto;           /* Centrer et espacer l’encadré */
+}
+
+/* Styles responsive */
+@media (max-width: 768px) {
+    .conclusionBlock {
+        padding: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .conclusionBlock {
+        padding: 8px;
+        font-size: 0.9em;       /* Ajuste la taille du texte */
+    }
 }

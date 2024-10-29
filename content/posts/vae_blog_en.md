@@ -6,7 +6,7 @@ showReadingTime : true
 showPostNavLinks : true
 ---
 # From Variational Inference to Variationnal Auto Encoder (VAE) and more
-In recent articles on data generation, the state of the art appears to be achieved by models based on the ``Variationnal Auto Encoder``.
+In recent articles about data generation, the state of the art appears to be achieved by models based on the ``Variationnal Auto Encoder``.
 To understand this model, we need to delve into two key concepts: ``Variationnal Inference`` (VI) and ``Auto Encoder`` (AE).
 
 #### **Summary**
@@ -41,7 +41,7 @@ Bad news : $p_\theta(z|x)$ is untractable.
 `Variationnal Inference` is a branch of statistics that aims to approximate an unknown distribution using known distributions  $\{q_{\phi}\}$. One approach to approximate the unknown distribution is by adjusting $\phi$, the parameter of the known distribution..
 
 For example, if you want to approximate a given distribution using a Gaussian family, you need to adjust $\mu$ and $\sigma$ so that your gaussian distribution $q_{\mu,\sigma}$ closely matches the target distribution.
-![](/image/vae/animation_pillow.gif)
+![alt](/image/vae/animation_pillow.gif)
 
 **To initiate a *Variational Inference* you need the following elements :**
 1. **A family** of parameterized known distributions $\{q_{\phi}\}$.
@@ -81,7 +81,9 @@ $$\log(p_\theta(x)) \geq \textbf{ELBO}$$
 
 Moreover, we have an unbiased estimator of the ``ELBO`` with ``Monte-Carlo mathod``, since the ``ELBO`` is an expectation.
 
+{{<conclusionBlock>}}
 **To conclude, a Variational Inference problem can be writen as the argmax of the ``ELBO``**: $$\argmax_{\theta,\phi}\mathbb{E_{q_\phi(z|x)}}(\log{q_\phi(z|x)})-\mathbb{E_{q_\phi(z|x)}}(\log{p_\theta(x|z)}.p_\theta(z))$$
+{{</conclusionBlock>}}
 
 ### How to maximize the ELBO ? CAVI : Coordinate Ascent VI
 The fundamental algorithm to maximize ``ELBO`` and estimate the approximate distribution $q$ is the ``Coordinate Ascent VI`` (CAVI) algorithm.
@@ -105,8 +107,7 @@ Initialization: Set parameters randomly.
 
 Repeat these steps until $|\textbf{ELBO}_t - \textbf{ELBO}_{t-1}| < \epsilon$.
 
-
-### From Gradient Ascent VI and Normal Gradient to BBVI
+### Gradient Ascent VI and Normal Gradient
 Since the goal is to find the optimal values of $(\theta, \phi)$ by maximizing ``ELBO``, we can sometimes compute its gradient and perform the optimization of $(\theta, \phi)$ similarly to a gradient descent.
 
 $$\theta^{t} = \theta^{t-1}+\alpha^t.\nabla_\theta\textbf{ELBO} \\
@@ -114,62 +115,21 @@ $$\theta^{t} = \theta^{t-1}+\alpha^t.\nabla_\theta\textbf{ELBO} \\
 
 This method is called **Gradient Ascent VI**.
 
-<u> *But is the gradient really a good metric to compare distributions ?*</u>
+<u> **But is the gradient really a good metric to compare distributions ?**</u>
+
 The gradient (and derivatives in general) are naturally defined using an Euclidean distance.
 Here, the Euclidean distance is considered in the parameter space.
 
 Let's look at an example.
 ![](/image/vae/di-similar_gauss.png)
+
 Visually, the first two distributions are similar, while the other two barely overlap.
 However, the canonical Euclidean distance with respect to $\mu$ suggests the opposite.
 
 **The Euclidean gradient is sometimes not well adapted to VI.**
 
-<u> The solution : Natural Gradient, a Riemanian gradient </u>
-As explained in this [paper](https://arxiv.org/html/2406.01870v1), the solution is to define a gradient in a Riemannian space using a symmetric version of the **KL** divergence.
-This solution is also discussed in the [Stochastic VI paper](https://arxiv.org/pdf/1206.7051).
+<u> **The solution : Natural Gradient, a Riemanian gradient** </u>
 
-This gradient is called the ``Natural Gradient`` and is denoted by $\nabla^{\text{natural}}=\mathcal{I}^{-1}(q) \cdot \nabla$.
-It is the product of the inverse of the ``Fischer matrix`` and the original gradient.
-
-This leads to the definition of the ``Natural Gradient Ascent VI``, which incorporates the normal gradient into its formula.
-$$\theta^{t} = \theta^{t-1}+\alpha^t.\nabla_\theta^{\text{natural}}\textbf{ELBO}\\
-\phi^{t} = \phi^{t-1}+\alpha^t.\nabla_\phi^{\text{natural}}\textbf{ELBO} $$
-
-Here is a summary of the VI methods to obtain the posterior distribution from the ELBO:
-![](/image/vae/vi-methods/2.png)
-
-**<u> How to compute ELBO gradients ? Is there a trick ?</u>**
-
-As in Gradient Ascent VI, the Normal Gradient is **easy to compute with an exponential family**; however, approximating distributions with complex models complicates the calculations.
-
-The difficulty arises from deriving the integral (since expectation is an integral) for the gradient with respect to $\phi$ : $$\nabla_\phi \textbf{ELBO} = \nabla_\phi \mathbb{E}_{q_\phi(z|x)}(\log{q_\phi(z|x)}-\log{p_\theta(x|z)}.p_\theta(z))$$
-
-To simplify the computation we use the ``log-derivative trick``.
-
-It can be shown that : $$\nabla_\phi \textbf{ELBO} = \mathbb{E}_{q_\phi(z|x)}[(\log{p_\theta(x|z)}.p_\theta(z)-\log{q_\phi(z|x)}).\nabla_\phi \log{q_\phi(z|x)}]$$
-With this trick, the gradient is applied only to $\log{q(z)}$
-
-### From Gradient Ascent VI and Normal Gradient to BBVI
-Since the goal is to find the optimal values of $(\theta, \phi)$ by maximizing ``ELBO``, we can sometimes compute its gradient and perform the optimization of $(\theta, \phi)$ similarly to a gradient descent.
-
-$$\theta^{t} = \theta^{t-1}+\alpha^t.\nabla_\theta\textbf{ELBO} \\
-\phi^{t} = \phi^{t-1}+\alpha^t.\nabla_\phi\textbf{ELBO}$$
-
-This method is called **Gradient Ascent VI**.
-
-<u> *But is the gradient really a good metric to compare distributions ?*</u>
-The gradient (and derivatives in general) are naturally defined using an Euclidean distance.
-Here, the Euclidean distance is considered in the parameter space.
-
-Let's look at an example.
-![](/image/vae/di-similar_gauss.png)
-Visually, the first two distributions are similar, while the other two barely overlap.
-However, the canonical Euclidean distance with respect to $\mu$ suggests the opposite.
-
-**The Euclidean gradient is sometimes not well adapted to VI.**
-
-<u> The solution : Natural Gradient, a Riemanian gradient </u>
 As explained in this [paper](https://arxiv.org/html/2406.01870v1), the solution is to define a gradient in a Riemannian space using a symmetric version of the **KL** divergence.
 This solution is also discussed in the [Stochastic VI paper](https://arxiv.org/pdf/1206.7051).
 
@@ -196,13 +156,14 @@ With this trick, the gradient is applied only to $\log{q(z)}$.
 
 Then the gradient is computed with the ``Monte-Carlo method`` from sample of $q(z)$. This calculation is feasible because at a fixed time, $q(z)$ is known.
 
+{{<conclusionBlock>}}
 In summary, the ELBO's gradient with respect to $\phi$ takes the following approximation in the general case: $$\nabla_\phi \textbf{ELBO}(x^k) \approx \frac 1 S \sum_i{(\log{p_\theta(x^k|z_i)}.p_\theta(z_i)-\log{q_\phi(z_i|x^k)}).\nabla_\phi \log{q_\phi(z_i|x^k)}} \\ z_i \sim q $$
 
 This formula provides a <u>stochastic approximation</u> of the gradient. We will see that this kind of stochastic approach can be extended to improve VI.
 
 Finally, to compute the ELBO's gradient with respect to $\theta$, we only have to apply the gradient to the expectation:
 $$\nabla_\theta\textbf{ELBO}(x^k)\approx-\sum_i\nabla_\theta [\log p_\theta(x^k,z_i)] $$
-
+{{</conclusionBlock>}}
 
 ### Stochastic VI and Limitations of classic VI algorithms
 The main drawback of classic VI is that each substep and iteration requires processing the entire dataset.
@@ -217,17 +178,21 @@ This leads to ``Stochastic Variational Inference`` (SVI), which is **more scalab
 ![](/image/vae/vi-methods/3.png)
 
 **<u>Black-Box Variational Inference - BBVI</u>** : 
+
 By combining ``mini-batches`` with a stochastic approximation of the gradient, we develop a comprehensive method of Stochastic Variational Inference that operates on complex models without requiring the mean-field assumption: ``Black-Box VI``.
 
 You can read the original paper here : [BBVI](https://arxiv.org/pdf/1401.0118).
 
+{{<conclusionBlock>}}
 The BBVI optimizes the ``ELBO`` with the following algorithm :
+
 1. Choose a statistical model and a family distribution for $q_\phi(z|x)$. Initialize with random values for $\phi$ and $\theta$.
 2. Draw samples $\{z_i\}$ from $q_\phi(z|x)$
 3. Apply the ``log-derivative trick`` and ``Monte-Carlo method`` to estimate the gradient : $$\nabla_\phi \textbf{ELBO}(x^k) \approx \frac 1 S \sum_i{(\log{p_\theta(x^k|z_i)}.p_\theta(z_i)-\log{q_\phi(z_i|x^k)}).\nabla_\phi \log{q_\phi(z_i|x^k)}}\\
 \nabla_\theta\textbf{ELBO}(x^k)\approx-\sum_i\nabla_\theta [\log p_\theta(x^k,z_i)]$$
 4. Construct ``mini-batches`` with your dataset and refresh the $\theta$ with : $$\theta^{t} = \theta^{t-1}+\alpha^t.\nabla_\theta\textbf{ELBO} \\
 \phi^{t} = \phi^{t-1}+\alpha^t.\nabla_\phi\textbf{ELBO}$$
+{{</conclusionBlock>}}
 
 However, this method's flexibility often results in high variance.
 To address this, the paper suggests solutions such as ``Rao-Blackwellization`` and control variates methods. The last one is introduced in this [paper](https://arxiv.org/pdf/1301.1299). 
@@ -276,6 +241,7 @@ Since the ``encoder`` retains only the key information, the document is now comp
 The decoder can then reconstruct the document using the ``auto-encoder`` principle: the ``encoder`` input is also the ``decoder`` output.
 
 <u>**Can data be generated once the latent space is built?**</u>
+
 Let's consider an ``auto-encoder`` trained for image reconstruction with a ``latent space`` $Z$.
 What if we take a random point $z \in Z$ and pass it to the decoder to generate an image?
 
@@ -299,13 +265,13 @@ We model the VAE and the data as follows:
 
 ![](/image/vae/vae_space.png)
 
-1. The input dataset \( \mathcal{D} \) and its corresponding representation in the latent space, \( \mathcal{D'} \)
-2. \( p_\theta(x) \): the modeled distribution of the dataset images in the input space, and \( p_\theta(z) \): the modeled distribution of the latent variables in the latent space.
-3. \( p_\theta(z|x) \): the distribution mapping the input space to the latent space, and \( p_\theta(x|z) \): the distribution mapping the latent space to the output space.
+1. The input dataset $ \mathcal{D} $ and its corresponding representation in the latent space, $ \mathcal{D'} $
+2. $ p_\theta(x) $: the modeled distribution of the dataset images in the input space, and $p_\theta(z)$: the modeled distribution of the latent variables in the latent space.
+3. $p_\theta(z|x)$: the distribution mapping the input space to the latent space, and $p_\theta(x|z)$: the distribution mapping the latent space to the output space.
 
-Using similar notation, we denote the true distributions as \( p^*(x) \) and \( p^*(z) \).
+Using similar notation, we denote the true distributions as $p^*(x)$ and $p^*(z)$.
 
-We aim to approximate \( p_\theta(z|x) \) with \( q_\theta(z|x) \) using variational inference, seeking to maximize the ELBO.
+We aim to approximate $p_\theta(z|x)$ with $q_\theta(z|x)$ using variational inference, seeking to maximize the ELBO.
 
 The VAE paper introduces a method for computing the ELBO gradient with reduced variance, known as the ``reparametrization trick``. As a result, the training algorithm differs slightly from that of ``BBVI``. ([see paper](https://arxiv.org/pdf/1506.02557)).
 
@@ -376,11 +342,12 @@ This method is called ``amortized variational inference``.
 
 Thus, the expectation term in the ELBO loss function becomes deterministic and corresponds to the MSE loss between the original data and the expectation of $p_\theta(x|z)$.
 
+{{<conclusionBlock>}}
 **As a consequence, a VAE is an encoder-decoder model where the encoder learns $\mu$ and $\sigma$.  
 These parameters are learned through a dataset $\mathcal D$ and the ELBO loss function:**  
 $$\mathcal L(x^k, \mu,\sigma,y_\mu) = -\frac 1 2(\log\sigma^2-\mu^2-\sigma^2+1) + (x-y_\mu)^2$$  
 The gradient is computed with the reparametrization trick and then is updated with an optimizer on parameters of distributions.
-
+{{</conclusionBlock>}}
 ![](/image/vae/amortized-vae.png)
 
 A typical forward pass involves feeding the encoder an image $x$, after which the encoder produces $\mu$ and $\sigma$.  
@@ -574,7 +541,7 @@ $$\mathcal{L}_{\text{VAE}}(x) =
 
 
 ## Conclusion
-
+{{<conclusionBlock>}}
 We have seen that Variational Inference methods help us approximate distributions by minimizing the Evidence Lower Bound using the Kullback-Leibler divergence and algorithms like CAVI or BBVI. VI introduces tricks to compute gradients efficiently, such as the log-derivative trick or reparameterization trick.
 
 In generative deep learning, VI allows us to construct stochastic latent spaces, which are more continuous than deterministic latent spaces.
@@ -584,6 +551,7 @@ This leads to models such as Variational Auto-Encoders. These kinds of models ha
 However, modifications to the architectures and loss functions help VAE-like models become competitive, state-of-the-art models in data generation.
 
 Moreover, VAE-like models produce a latent space, not just a black-box generator. These models are suitable for encoding tasks.
+{{</conclusionBlock>}}
 
 This article is the first stage of a project in my final year of engineering studies. I will study the training of NVAE and then use it to improve cardiac shape segmentation.
 
