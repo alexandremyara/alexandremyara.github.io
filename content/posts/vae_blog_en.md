@@ -332,7 +332,7 @@ We want a continuous space, so the natural choice is to set $p_\theta(z) \sim \m
 {{</figure>}}
 
 **<u>Choice of $q_\phi(z|x)$ for the training:</u>**
-  
+
 Since $p_\theta(z)$ is Gaussian, we will have an analytical solution for the $\textbf{KL}(q_\phi(z|x)||p_\theta(z))$ term if we choose $q_\phi(z|x) \sim \mathcal{N(z|\mu(x),\sigma^2(x))}$.
 
 As a consequence, we have with calculus: $\textbf{KL}(q_\phi(z|x)||p_\theta(z)) = -\frac 1 2(\log\sigma^2-\mu^2-\sigma^2+1)$.
@@ -585,7 +585,7 @@ Moreover, VAE-like models produce a latent space, not just a black-box generator
 This article is the first stage of a project in my final year of engineering studies. I will study the training of NVAE and then use it to improve cardiac shape segmentation.
 
 
-### Bibliographies
+### Bibliography
 [1] : David M. Blei, Alp Kucukelbir, Jon D. McAuliffe (2018), [Varitional Inference : a review for statisticians](https://arxiv.org/pdf/1601.00670)
 
 [2] : Kaiwen Wu, Jacob R. Gardner (2024), [Understanding Stochastic Natural Gradient Variational Inference](https://arxiv.org/html/2406.01870v1)
