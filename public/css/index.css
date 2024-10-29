@@ -6,58 +6,55 @@ body {
     margin-top: -100px;
 }
 
-#presentation{
-    margin-top:0;
+#presentation {
+    margin-top: 0;
 }
 
-p{
-    margin-left : 20px;
+p {
     font-size: 16px;
     line-height: 1.5;
+    margin: 0;
 }
+
 h1 {
-    margin:0;
-    margin-left: 20px;
+    margin: 0;
     font-size: 40px;
     font-weight: normal;
+    text-align: left;
 }
 
 h2 {
     margin: 0;
     margin-top: 5px;
-    margin-left: 20px;
     font-size: 18px;
     font-weight: lighter;
     color: #666;
+    text-align: left;
 }
-#presentation{
+
+#presentation {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
 }
 
-.presentation-title{
-    margin-left : -20px;
-}
-
 .presentation-container {
     display: flex;
-    align-items: flex-start; /* Aligner l'image et le texte en haut */
-    gap: 20px; /* Ajouter un espace entre l'image et le texte */
+    align-items: flex-start;
+    gap: 20px;
     margin-top: 20px;
-    /*margin-left: 20px;*/
 }
+
 .presentation-container p {
-    flex: 1; /* Le paragraphe prend tout l'espace restant */
-    margin-top: -7px; /* Supprimer les marges par défaut si nécessaire */
+    flex: 1;
+    margin: 0;
 }
+
 img {
     object-fit: cover;
-    float: left;
     width: 250px;
     height: 200px;
-    margin-top:0;
-    margin-right: 10px;
+    margin: 0;
 }
 
 section {
@@ -75,6 +72,7 @@ table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
+    overflow-x: auto;
 }
 
 table, th, td {
@@ -91,16 +89,17 @@ th {
     color: white;
 }
 
-li{
+li {
     line-height: 1.6;
 }
+
 #cv h2 {
     text-align: center;
     margin-top: 40px;
 }
 
-.course_description{
-    margin-left: 50px;
+.course_description {
+    margin-left: 20px;
 }
 
 a {
@@ -119,4 +118,70 @@ footer {
     color: white;
     width: 100%;
     bottom: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 32px;
+        text-align: left;
+        margin-left: 20px;
+    }
+
+    h2, h3, .presentation-container, p {
+        text-align: left;
+        margin-left: 20px;
+    }
+
+    .presentation-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    img {
+        width: 80%; /* Réduction de l'image pour tablettes */
+        height: auto;
+        margin-left: 20px;
+    }
+
+    table {
+        width: 100%;
+        overflow-x: auto;
+        display: block; /* Active le défilement horizontal pour le tableau */
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 28px;
+        margin-left: 10px;
+    }
+
+    h2, h3, p, .presentation-container {
+        font-size: 14px;
+        margin-left: 10px; /* Marge gauche commune */
+        line-height: 1.8; /* Plus d'espace pour aérer le texte */
+    }
+
+    img {
+        width: 70%; /* Image réduite davantage pour téléphone */
+        height: auto;
+        margin-left: 10px; /* Marge commune */
+    }
+
+    table, th, td {
+        font-size: 14px; /* Taille de texte ajustée */
+        padding: 8px;    /* Réduction de padding pour lisibilité */
+    }
+
+    table {
+        width: 100%;    /* Conserve la largeur sans empilement */
+        overflow-x: auto;
+    }
+
+    .course_description {
+        margin-left: 10px;
+    }
 }
