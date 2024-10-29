@@ -71,7 +71,7 @@ $\textbf{KL}(q_\phi(z|x)||p_\theta(z|x))=$<span style="border: 2px solid #d15a76
 
 $\textbf{KL}(q_\phi(z|x)||p_\theta(z|x))=$-<span style="border: 2px solid #d15a76; padding:3px">$\textbf{ELBO}$</span>+$\log{p_\theta(x)}$
 
-Maximise <span style="color:#d15a76">the red box</span> is equivalent to minimize the ``KL``.
+Maximise <span style="color:#d15a76">the red box</span> is equivalent to minimise the ``KL``.
 This quantity, in the red box, is the ``ELBO`` (Evidence Lower Bound).
 $$\textbf{ELBO}=\mathbb{E_{q_\phi(z|x)}}(\log{q_\phi(z|x)})-\mathbb{E_{q_\phi(z|x)}}(\log{p_\theta(x|z)}.p_\theta(z))$$
 
