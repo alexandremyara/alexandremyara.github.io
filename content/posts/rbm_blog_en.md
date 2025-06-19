@@ -17,11 +17,11 @@ Ces méthodes sont performantes mais peuvent avoir des coûts de calculs importa
 Une idée est de sintéresser à comment la nature fonctionne.
 Prenons l'exemple d'une balle lancée sur Terre.
 
-![](image/energy/pomme.png)
+![](/image/energy/pomme.png)
 Afin d'inférer la trajectoire $y$ de la pomme à partir des informations initiales $x$, la physique ne nous force pas à utiliser des algorithmes nécessitant de parcourir l'espace des trajectoires possibles.
 Les lois de la physique choisissent simplement la courbe qui minimise l'énergie mécanique totale.
 L'expression de cette énergie est parfaitement connue à chaque instant $$\mathcal{E} = \frac 1 2 .mv^2 + mgy$$ et donc la forme de la trajectoire optimale en découle directement.
-![alt text](image/energy/ep.png)
+![alt text](/image/energy/ep.png)
 
 On a donc mis en évidence le fait que l'inférence de $y$ grâce à $x$ passe par une minimisation d'une fonction qui a l'avantage de ne pas nécessiter d'approximation sur la forme des données, ni même de requerir un label de $x$.
 
