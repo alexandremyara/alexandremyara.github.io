@@ -25,7 +25,19 @@ $$
 In other words, generation can be seen as moving probability mass from an easy distribution to $p_{\text{data}}$.
 
 ## Static transport
+Static transport is the natural formulation of our problem. The key idea is to find an objective to build an application $T$ which transports the noise distribution $\tilde p$ to $p_\text{data}$. 
+
+The keyword "static" comes in opposition with "dynamic transport", where $T$ is no longer one application but a path in the distribution space (a familly of distribution).
+
+We have selected two popular examples of static transport: GAN (Generative Adversarial Network) and Normalizing Flows. 
+
 ### GAN
+
+{{<figure caption="Figure  - Simple GAN Architecture.">}}
+![alt](/image/transport/gan.png)
+{{</figure>}}
+
+
 ### Normalizing flows
 ### Limit of static transport
 
