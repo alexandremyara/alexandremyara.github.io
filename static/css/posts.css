@@ -27,6 +27,16 @@ body {
         margin: 2%;
     }
 }
+/* Stabilise la largeur et centre les images */
+article img {
+  display: block;
+  width: 100%;
+  max-width: 670px; /* ou 900px si tu préfères plus large */
+  height: auto;
+  margin: 0 auto;
+}
+
+html { overflow-y: scroll; }
 
 img {
     display: block;

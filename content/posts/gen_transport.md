@@ -18,11 +18,17 @@ At the beginning, the only thing we have is a finite sample from $p_{\text{data}
 $$
 \hat p_{\text{data}} \;=\; \frac{1}{N}\sum_{i=1}^N \delta_{x_i}.
 $$
+
 A second major idea—central to many modern generative models—is to start from a simple reference distribution $\tilde p$ (typically a standard Gaussian) and learn a transport $T_\theta$ that pushes it forward to the data distribution:
 $$
 (T_\theta)_\# \tilde p \approx p_{\text{data}}.
 $$
-In other words, generation can be seen as moving probability mass from an easy distribution to $p_{\text{data}}$.
+
+{{< figure caption="Figure — Simple GAN Architecture." >}}
+![alt](/image/transport/transport.png)
+{{< /figure >}}
+
+**In other words, generation can be seen as moving probability mass from an easy distribution to $p_{\text{data}}$.**
 
 ## Static transport
 Static transport is the natural formulation of our problem. The key idea is to find an objective to build an application $T$ which transports the noise distribution $\tilde p$ to $p_\text{data}$. 
@@ -33,10 +39,59 @@ We have selected two popular examples of static transport: GAN (Generative Adver
 
 ### GAN
 
-{{<figure caption="Figure  - Simple GAN Architecture.">}}
-![alt](/image/transport/gan.png)
-{{</figure>}}
+The neural network vision of a GAN is two networks train in competition. A ``generator`` $G_\theta(z)$ produces synthetic images from noise and a ``discriminator`` $D_\phi(\codt)$.
+We feed the discriminator with synthetic images from $G$ and with real images from $\hat p_\text{data}$. The network $D$ try to infer wheter or not its inputs are synthetic or real. 
 
+{{< figure caption="Figure — Simple GAN Architecture." >}}
+![alt](/image/transport/gan.png)
+{{< /figure >}}
+
+
+
+The loss is a min-max objective : 
+$$
+\min_{\theta}\ \max_{\phi}\ \mathcal{L}_{\mathrm{GAN}}(\theta,\phi)=
+\mathbb{E}_{x\sim p_{\text{data}}}\!\big[\log D_{\phi}(x)\big]+
+\mathbb{E}_{z\sim \tilde p}\!\big[\log\!\big(1-D_{\phi}(G_{\theta}(z))\big)\big].
+$$
+
+However this formulation is a classic deep learning vision, we build our intuition on the analysis of the objective function. This vision helps to see what task do we use to train each networks, but this suffers of a lack of information on how data are transported from a noise $\tilde p$ to an approximation of the real data distribution $p_\text{data}$.
+
+We aime to reformulate the objective function to extract the learnt transport application.
+
+We readily see that $G_\theta$ is the application which transport noise to $p_\text{data}$. Then we have $x \sim {G_\theta}_\#\,\tilde p$.
+The optimization to find the correct push-forward becomes : 
+
+$$
+\mathcal L(D_\phi, G_\theta) = \min_{\theta}\ \max_{\phi}\ \mathcal{L}_{\mathrm{GAN}}(\theta,\phi)=
+\mathbb{E}_{x\sim p_{\text{data}}}\!\big[\log D_{\phi}(x)\big]+
+\mathbb{E}_{x \sim {G_\theta}_\#\,\tilde p }\!\big[\log\!\big(1-D_{\phi}(G_{\theta}(z))\big)\big].
+$$
+
+Once set, we want to find a $D^*$ which optimizes $G_\theta$. By using the KKT condition and admitting that each measure are absolutly continuous we show that:
+
+$$
+D^*(x) = \frac {p_\text{data}(x)}  {p_\text{data}(x) + {G_\theta}_\#\,\tilde p(x)}
+$$
+We reinject this optimum and find that:
+$$\mathcal L(D^*, G_\theta) = -\log 4 + \textrm{KL}(p_\text{data}\mid\mid m) + \textrm{KL}({G_\theta}_\#\,\tilde p \mid\mid m), \qquad \text{ where }2m = p_\text{data}+ {G_\theta}_\#\,\tilde p$$
+Then the objective one our transport is an optimization in the transport application space with Jensen distance as metric.
+
+This appears to be the Jensen-Shannon divergence, $\textrm{JS}$. This formulation helps to see that GAN are not only an association of neural networks but a real optimization on a push-forward noise to data, in the case of a discriminator perfectly optimized.
+The final objective in this case is :
+$$
+\min_G \textrm{JS}(p_\text{data}\mid\mid {G_\theta}_\#\,\tilde p)
+$$
+
+This formulation tries to give a theoric objective. In pratice $D$ is not perfectly optimized and $G$ doesn't follow stricly a minimal $\textrm{JS}$ curve but a neural divergence induced by the network. With a finite capacity for $D$, the class of function possible for $D$, denote $\mathcal F$, is restraint. The neural divergence is not defined from $D^*$ but from a $\sup$ on $\mathcal F$. 
+
+$$
+\mathcal d(p_\text{data}, {G_\theta}_\#\,\tilde p) =\sup_{D\in\mathcal F}\;
+\mathbb E_{x\sim p_{\text{data}}}\!\big[\log D(x)\big]
+\;+\;
+\mathbb E_{x\sim {G_\theta}_\#\,\tilde p}\!\big[\log\big(1-D(x)\big)\big],
+\qquad
+$$
 
 ### Normalizing flows
 ### Limit of static transport
@@ -287,8 +342,10 @@ Why bother with $j_t$ or $v_t$? Because it gives a concrete object to compare. I
 
 
 #### ODE dynamic
-##### ODE Probability flow
 ##### Define a velocity: Continuity equation
+##### ODE Probability flow
+##### Continuous Normalizing Flows
+
 
 ### Use the learnt dynamic to transport
 ##### Time discretization and step schedule

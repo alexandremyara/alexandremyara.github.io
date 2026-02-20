@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+
+<link rel="icon" type="image/png" href="icon/icon.png">
+<title></title>
+
+
+
+    <link rel="stylesheet" href="/css/posts.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+
+<br><br>    
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+
+<br><br>    
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"
+        onload="renderMathInElement(document.body);"></script>
+
+<br><br>    <script>document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+            
+            delimiters: [
+                            {left: "$$", right: "$$", display: true},
+                            {left: "$", right: "$", display: false}
+                        ]
+            });
+        });
+    </script>
+</head>
+<body>
+    
+        <header>
+<a href="/"> back to home</a>
+</header>
+
+    
+    
+    <article>
+        <div><h1 id="understanding-generative-modeling-through-transport-theory">Understanding Generative Modeling through transport theory</h1>
+<p>A general idea behind generative modeling is to approximate an unknown distribution $p_{\text{data}}$ by a learnable distribution $p_\theta$.</p>
+<p>At the beginning, the only thing we have is a finite sample from $p_{\text{data}}$, i.e. a dataset $\mathcal{D}=\{x_i\}_{i=1}^N$, which defines the empirical (discrete) distribution
+</p>
+$$
+\hat p_{\text{data}} \;=\; \frac{1}{N}\sum_{i=1}^N \delta_{x_i}.
+$$<p>Several ideas have been proposed to approximate $p_{\text{data}}$. A major one is the variational autoencoder (VAE) introduced by Kingma &amp; Welling (2013), which learns a latent-variable model. One assumes a prior $p(z)$ and a decoder (generative) distribution $p_\theta(x\mid z)$, so that the model distribution is
+</p>
+$$
+p_\theta(x) \;=\; \int p_\theta(x\mid z)\,p(z)\,dz.
+$$<p>
+Since the true posterior $p_\theta(z\mid x)$ is generally intractable, VAEs use variational inference with an encoder $q_\phi(z\mid x)$ to approximate it, typically a mean-field (e.g. diagonal-covariance Gaussian) family.</p>
+<p>However, despite their elegant probabilistic framework, “vanilla” VAEs (mean-field Gaussian posterior, simple Gaussian decoder, etc.) are no longer the dominant approach for high-fidelity generation.
+At the beginning, the only thing we have is a finite sample from $p_{\text{data}}$, i.e. a dataset $\mathcal{D}=\{x_i\}_{i=1}^N$, which defines the empirical (discrete) distribution
+</p>
+$$
+\hat p_{\text{data}} \;=\; \frac{1}{N}\sum_{i=1}^N \delta_{x_i}.
+$$<p>A second major idea—central to many modern generative models—is to start from a simple reference distribution $\tilde p$ (typically a standard Gaussian) and learn a transport $T_\theta$ that pushes it forward to the data distribution:
+</p>
+$$
+(T_\theta)_\# \tilde p \approx p_{\text{data}}.
+$$
+  <figure class="figure">
+    <img src="/image/transport/transport.png" alt="alt">
+    <figcaption class="figure-caption">Figure — Simple GAN Architecture.</figcaption>
+  </figure>
+
+
+<p><strong>In other words, generation can be seen as moving probability mass from an easy distribution to $p_{\text{data}}$.</strong></p>
+<h2 id="static-transport">Static transport</h2>
+<p>Static transport is the natural formulation of our problem. The key idea is to find an objective to build an application $T$ which transports the noise distribution $\tilde p$ to $p_\text{data}$.</p>
+<p>The keyword &ldquo;static&rdquo; comes in opposition with &ldquo;dynamic transport&rdquo;, where $T$ is no longer one application but a path in the distribution space (a familly of distribution).</p>
+<p>We have selected two popular examples of static transport: GAN (Generative Adversarial Network) and Normalizing Flows.</p>
+<h3 id="gan">GAN</h3>
+<p>The neural network vision of a GAN is two networks train in competition. A <code>generator</code> $G_\theta(z)$ produces synthetic images from noise and a <code>discriminator</code> $D_\phi(\codt)$.
+We feed the discriminator with synthetic images from $G$ and with real images from $\hat p_\text{data}$. The network $D$ try to infer wheter or not its inputs are synthetic or real.</p>
+
+  <figure class="figure">
+    <img src="/image/transport/gan.png" alt="alt">
+    <figcaption class="figure-caption">Figure — Simple GAN Architecture.</figcaption>
+  </figure>
+
+
+<p>The loss is a min-max objective :
+</p>
+$$
+\min_{\theta}\ \max_{\phi}\ \mathcal{L}_{\mathrm{GAN}}(\theta,\phi)=
+\mathbb{E}_{x\sim p_{\text{data}}}\!\big[\log D_{\phi}(x)\big]+
+\mathbb{E}_{z\sim \tilde p}\!\big[\log\!\big(1-D_{\phi}(G_{\theta}(z))\big)\big].
+$$<p>However this formulation is a classic deep learning vision, we build our intuition on the analysis of the objective function. This vision helps to see what task do we use to train each networks, but this suffers of a lack of information on how data are transported from a noise $\tilde p$ to an approximation of the real data distribution $p_\text{data}$.</p>
+<p>We aime to reformulate the objective function to extract the learnt transport application.</p>
+<p>We readily see that $G_\theta$ is the application which transport noise to $p_\text{data}$. Then we have $x \sim {G_\theta}_\#\,\tilde p$.
+The optimization to find the correct push-forward becomes :</p>
+$$
+\mathcal L(D_\phi, G_\theta) = \min_{\theta}\ \max_{\phi}\ \mathcal{L}_{\mathrm{GAN}}(\theta,\phi)=
+\mathbb{E}_{x\sim p_{\text{data}}}\!\big[\log D_{\phi}(x)\big]+
+\mathbb{E}_{x \sim {G_\theta}_\#\,\tilde p }\!\big[\log\!\big(1-D_{\phi}(G_{\theta}(z))\big)\big].
+$$<p>Once set, we want to find a $D^*$ which optimizes $G_\theta$. By using the KKT condition and admitting that each measure are absolutly continuous we show that:</p>
+$$
+D^*(x) = \frac {p_\text{data}(x)}  {p_\text{data}(x) + {G_\theta}_\#\,\tilde p(x)}
+$$<p>
+We reinject this optimum and find that:
+</p>
+$$\mathcal L(D^*, G_\theta) = -\log 4 + \textrm{KL}(p_\text{data}\mid\mid m) + \textrm{KL}({G_\theta}_\#\,\tilde p \mid\mid m), \qquad \text{ where }2m = p_\text{data}+ {G_\theta}_\#\,\tilde p$$<p>
+Then the objective one our transport is an optimization in the transport application space with Jensen distance as metric.</p>
+<p>This appears to be the Jensen-Shannon divergence, $\textrm{JS}$. This formulation helps to see that GAN are not only an association of neural networks but a real optimization on a push-forward noise to data, in the case of a discriminator perfectly optimized.
+The final objective in this case is :
+</p>
+$$
+\min_G \textrm{JS}(p_\text{data}\mid\mid {G_\theta}_\#\,\tilde p)
+$$<p>This formulation tries to give a theoric objective. In pratice $D$ is not perfectly optimized and $G$ doesn&rsquo;t follow stricly a minimal $\textrm{JS}$ curve but a neural divergence induced by the network. With a finite capacity for $D$, the class of function possible for $D$, denote $\mathcal F$, is restraint. The neural divergence is not defined from $D^*$ but from a $\sup$ on $\mathcal F$.</p>
+$$
+\mathcal d(p_\text{data}, {G_\theta}_\#\,\tilde p) =\sup_{D\in\mathcal F}\;
+\mathbb E_{x\sim p_{\text{data}}}\!\big[\log D(x)\big]
+\;+\;
+\mathbb E_{x\sim {G_\theta}_\#\,\tilde p}\!\big[\log\big(1-D(x)\big)\big],
+\qquad
+$$<h3 id="normalizing-flows">Normalizing flows</h3>
+<h3 id="limit-of-static-transport">Limit of static transport</h3>
+<p>The “static” viewpoint targets a final push-forward relation $(T_\theta)_\# \tilde p \approx p_{\text{data}}$ and focuses on learning (or parameterizing) a transformation that achieves this match. Even when $T_\theta$ is implemented as a composition of simpler maps (as in normalizing flows), the emphasis remains on the existence of a single overall transport that connects $\tilde p$ to the data distribution.</p>
+<p>This perspective has a natural limitation: it does not explicitly model how probability mass should evolve along the way. In other words, the intermediate distributions induced by partial compositions are not part of the formulation. This motivates making the transport path explicit by introducing an indexed family of distributions $(q_t)$ and learning a dynamics that progressively moves $\tilde p$ toward $p_{\text{data}}$.</p>
+<h2 id="dynamic-transport">Dynamic transport</h2>
+<p>Instead of learning a single map $T_\theta$ that directly pushes $\tilde p$ to $p_{\text{data}}$, the dynamic viewpoint decomposes the transport into a sequence (or a continuum) of simpler transformations. This is done by introducing a family of intermediate distributions $(q_t)$ indexed either by a discrete time $k\in\mathbb{N}$ or a continuous time $t\in[0,1]$, with
+</p>
+$$
+q_0 = \tilde p,
+\qquad
+q_1 \approx p_{\text{data}}.
+$$<p>In discrete time, we consider maps $(T_k)_{k=0}^{K-1}$ and define the evolution by repeated push-forward:
+</p>
+$$
+q_{k+1} = (T_k)_\# q_k,
+\qquad
+\text{so that}
+\qquad
+q_K = (T_{K-1}\circ \cdots \circ T_0)_\# \tilde p.
+$$<p>In continuous time, we instead describe a time-indexed transformation (a flow) $(\Phi_{0\to t})_{t\in[0,1]}$ and set
+</p>
+$$
+q_t = (\Phi_{0\to t})_\# \tilde p,
+\qquad
+q_1 = (\Phi_{0\to 1})_\# \tilde p \approx p_{\text{data}}.
+$$<p>The next sections explain how such a flow can be specified and learned through ODE or SDE dynamics.</p>
+<h3 id="define-and-learn-a-dynamic">Define and learn a dynamic</h3>
+<p>We call a dynamics an ODE or an SDE that describes how a random variable $X_t \sim q_t$ evolves over time.</p>
+<h4 id="sde-dynamic">SDE dynamic</h4>
+<p>Let $X_t \sim q_t$. A general SDE has the form
+</p>
+$$
+dX_t \;=\; a(X_t,t)\,dt \;+\; b(X_t,t)\,dW_t,
+\qquad \text{where } W_t \text{ is a Brownian}
+$$<p>In this formulation, defining a transport toward $p_{\text{data}}$ amounts to specifying a family of intermediate distributions $\{q_t\}$, which is implicitly determined by the coefficients $a(X_t,t)$ and $b(X_t,t)$.</p>
+<p>Unlike a deterministic transport map, an SDE defines a stochastic transport. In particular, for a fixed $x$ sampled from $\tilde p$, the output of the transport $\phi_{0\rightarrow1}(x)$ may differ across two runs. In this case, $\phi_{0\rightarrow1}$ should be understood as a Markov kernel.</p>
+<p>A common strategy is to first define a forward (noising) dynamics that transports $p_{\text{data}}$ to a simple reference distribution $\tilde p$, and then to learn or approximate the corresponding reverse transport starting from $\tilde p$.</p>
+<p>We denote by $d\overrightarrow X_t$ the forward dynamics (from data to noise), and by $d\overleftarrow X_t$ the reverse dynamics (from noise to data). The general form of the forward SDE is
+</p>
+$$
+d\overrightarrow X_t \;=\; a(\overrightarrow X_t,t)\,dt \;+\; b(\overrightarrow X_t,t)\,dW_t.
+$$<p>
+The reverse dynamics $d\overleftarrow X_t$ is then derived (or approximated) from the forward dynamics.</p>
+<p>This forward–reverse strategy is convenient because it is typically easy to design a forward noising process that maps $\hat p_{\text{data}}$ to a known reference distribution $\tilde p$ (often a Gaussian).</p>
+<h5 id="choose-coefficients-of-the-sde">Choose coefficients of the SDE</h5>
+<p>We choose a linear drift $a(\overrightarrow X_t,t) = -\lambda(t)\,\overrightarrow X_t$ and an isotropic diffusion $b(\overrightarrow X_t,t) = g(t)\,I$.</p>
+<p>Why do we start with these forms? As said previously, $\tilde p$ is often chosen to be Gaussian. With a linear drift and an isotropic diffusion, the conditional marginals $\{q_t(\cdot\mid X_0)\}_t$ remain Gaussian and admit closed-form expressions, fully determined by $\lambda$ and $g$.</p>
+$$
+\overrightarrow X_t \mid \overrightarrow X_0=x_0 \sim \mathcal N\!\big(\alpha(t)\,x_0,\ \sigma^2(t)\,I\big),
+$$$$
+\alpha(t)=\exp\!\Big(-\int_0^t \lambda(u)\,du\Big),
+\qquad
+\sigma^2(t)=\int_0^t \exp\!\Big(-2\int_s^t \lambda(u)\,du\Big)\,g(s)^2\,ds.
+$$<p>A second question is: why do we include the minus sign in front of $\lambda(t)$? By analogy with physics, the minus sign makes the deterministic part of the dynamics stable: the drift acts as a restoring force that pulls $\overrightarrow X_t$ toward $0$. Since $\tilde p$ is typically a zero-mean distribution, we want the forward dynamics to have a deterministic component that contracts toward $0$ while noise is progressively injected.
+Once $\lambda$ and $g$ are chosen, the forward SDE defines a family of marginals $(q_t)_{t\in[0,1]}$ and therefore a transport from $p_{\text{data}}$ (in practice, from $\hat p_{\text{data}}$) to a simple reference distribution $\tilde p$ (often $\mathcal N(0,I)$). In discrete implementations, we simulate a time grid and obtain a sequence
+</p>
+$$
+X_0 \sim \hat p_{\text{data}},\qquad X_{k+1} =\text{forward dynamic}(X_k),\qquad X_K \approx \tilde p,
+$$<p>
+so that the composition of these elementary transitions yields the overall forward transport.</p>
+<h5 id="some-examples-of-forward-dynamics">Some examples of forward dynamics</h5>
+<p>By using the suposition on the SDE coefficients, we build some popular forward process.</p>
+<ul>
+<li>Pure diffusion (no drift): We set the drift (determinist part) as $\lambda(t)=0$. The $\{q_t\mid X_0\}$ familly is gaussian with a variance increasing with respect to the time. Indeed, $Var(q_t \mid X_0) = \int^t_0 g(s)^2ds$. The dynamic converges to a gaussian with high variance $\sigma_\text{max}^2$.</li>
+<li>VP-SDE (variance-preserving): choose $\lambda(t)$ and $g(t)$ so that the marginals remain controlled and the terminal distribution matches (or is close to) $\mathcal N(0,I)$. We often reparametrize $\lambda(t) = \frac 1 2 \beta(t)$ and $g(t) = \sqrt{\beta(t)}$ and take $\beta(t)$ as a positive function. As a consequence the law of $X_t|X_0$ converges to $\mathcal N(0,1)$. The name &ldquo;variance preserving&rdquo; comes from the conditional to $X_0$ variance converges to 1 and that under condition on $X_0$, variance is contant to 1.</li>
+<li>Ornstein–Uhlenbeck (OU): The process is a VP-SDE but $\beta(t) = \beta$, a constant positive value.</li>
+<li>DDPM (discrete time) dynamics:
+$$
+X_{k+1} = \sqrt{1-\beta_k}\,X_k + \sqrt{\beta_k}\,\varepsilon_k,\qquad \varepsilon_k\sim\mathcal N(0,I).
+$$
+To obtain this dynamic we use a discrete time grid on VP-SDE.</li>
+</ul>
+<p>With those forward dynamics, we build $\{q_t\}$ and with them, we transport $p_\text{data}$ - in practice we transport $\hat p_\text{data}$ - to $\tilde p$ (often $\mathcal{N}(0,1)$).</p>
+<h5 id="reverse-dynamic">Reverse dynamic</h5>
+<p>We call a reverse dynamics a dynamics that transports $\tilde p$ into $p_{\text{data}}$.
+For a forward SDE
+</p>
+$$
+dX_t = a(t,X_t)\,dt + b(t,X_t)\,dW_t,
+\qquad X_t\sim q_t,
+$$<p>
+the corresponding reverse-time SDE (run from $t=1$ down to $t=0$) can be written as
+</p>
+$$
+d\overleftarrow X_t=\Big(
+a(t,X_t)-\Sigma(t,X_t)\,\nabla_x \log q_(X_t)+\nabla_x\!\cdot \Sigma(t,X_t)
+\Big)\,dt+b(t,X_t)\,d\bar W_t,\qquad\Sigma(t,x):=b(t,x)b(t,x)^\top,$$<p>
+and is simulated from $t=1$ down to $t=0$ starting from $X_1\sim\tilde p$.</p>
+<p>Here we assume that $a$, $b$, and the marginals $(q_t)_t$ satisfy the regularity and non-degeneracy conditions ensuring time-reversal of diffusions (as in Anderson (1982) and Haussmann &amp; Pardoux (1986)).</p>
+<p>In our isotropic setting $b(t,x)=g(t)I$ (so $\Sigma(t,x)=g(t)^2 I$ does not depend on $x$), the divergence term vanishes and this simplifies to
+</p>
+$$
+d\overleftarrow X_t=
+\Big(a(t,X_t) - g(t)^2\,s_t(X_t)\Big)\,dt
++
+g(t)\,d\bar W_t,
+\qquad
+s_t(x):=\nabla_x\log q_t(x).
+$$<p>
+In practice, the family of scores $(s_t)_t$ is approximated by a neural network (score matching / noise prediction) and then plugged into the reverse drift.</p>
+<p>The key idea is that, once the scores are learned, we can transport $\tilde p$ to $p_{\text{data}}$.</p>
+<h6 id="some-reverse-dynamics">Some reverse dynamics</h6>
+<ul>
+<li>
+<p>Reverse of pure diffusion (no drift): if $a(t,x)=0$ and $b(t,x)=g(t)I$, then
+</p>
+$$
+d\overleftarrow X_t=
+-\,g(t)^2\,s_t(\overleftarrow X_t)\,dt+g(t)\,d\bar W_t.$$</li>
+<li>
+<p>Reverse of VP-SDE: with $a(t,x)=-\tfrac12\beta(t)x$ and $b(t,x)=\sqrt{\beta(t)}\,I$, we obtain</p>
+</li>
+</ul>
+$$d\overleftarrow X_t=
+\Big(-\tfrac12\beta(t)\,\overleftarrow X_t-\beta(t)\,s_t(\overleftarrow X_t)\Big)\,dt
++
+\sqrt{\beta(t)}\,d\bar W_t.
+$$<ul>
+<li>
+<p>Reverse of Ornstein–Uhlenbeck: same as VP-SDE with $\beta(t)=\beta$ constant, i.e.
+</p>
+$$d\overleftarrow X_t=\Big(-\tfrac12\beta\,\overleftarrow X_t-\beta\,s_t(\overleftarrow X_t)\Big)\,dt+\sqrt{\beta}\,d\bar W_t.$$</li>
+<li>
+<p>Reverse of DDPM (discrete time): the reverse Markov chain is defined by
+</p>
+$$
+X_{k}
+=
+\frac{1}{\sqrt{\alpha_{k+1}}}
+\Big(
+X_{k+1} + \beta_{k+1}\,s_{k+1}(X_{k+1})
+\Big)+\sqrt{\tilde\beta_{k+1}}\;z,
+\qquad z\sim\mathcal N(0,I).
+$$$$
+\alpha_k:=1-\beta_k,
+\qquad
+\bar\alpha_k:=\prod_{i=1}^k \alpha_i,
+\qquad
+\tilde\beta_k:=\beta_k\,\frac{1-\bar\alpha_{k-1}}{1-\bar\alpha_k},
+$$</li>
+</ul>
+<h6 id="langevin-dynamics">Langevin dynamics</h6>
+<p>Langevin dynamics provides another way to sample from a target distribution using its score. Unlike diffusion models, it does not rely on an explicit forward noising process, but it requires (an approximation of) the score function $ \nabla_x \log p_{\text{target}}(x) $.</p>
+<p>Overdamped Langevin dynamics comes from physics and describes the evolution of a system under a potential $U$, while accounting for thermal Brownian noise. It can be written as
+</p>
+$$
+d\overleftarrow{X}_t = -\nabla U(\overleftarrow{X}_t)\,dt + \sqrt{2}\,d\overleftarrow{W}_t.
+$$<p>
+If $U$ is measurable and normalizable (i.e. $Z=\int_{\mathbb{R}^d} e^{-U(x)}\,dx < \infty$), then there exists a stationary density
+</p>
+$$
+p_\infty(x) = \frac{1}{Z}e^{-U(x)} \quad\text{(so } p_\infty \propto e^{-U}\text{)}.
+$$<p>The Fokker&ndash;Planck equation describes the time evolution of the density $q_t$ of $\overleftarrow{X}_t$ (under sufficient smoothness of drift and diffusion). In the Langevin case, it reads
+</p>
+$$
+\partial_t q_t = \nabla \cdot \big(q_t \nabla U\big) + \Delta q_t .
+$$<p>
+One can check that $p_\infty$ is stationary ($\partial_t p_\infty = 0$) since $ \nabla p_\infty = -p_\infty \nabla U $, hence $ \nabla\cdot(p_\infty \nabla U)+\Delta p_\infty = 0 $. Under suitable ergodicity assumptions (e.g. confining potentials), the law of $\overleftarrow{X}_t$ converges to $p_\infty$ as $t\to\infty$.</p>
+<p>Moreover, since $ \log p_\infty(x) = -U(x) - \log Z $, we have
+</p>
+$$
+\nabla \log p_\infty(x) = -\nabla U(x),
+$$<p>
+so the dynamics can be rewritten in score form as
+</p>
+$$
+d\overleftarrow{X}_t = \nabla \log p_\infty(\overleftarrow{X}_t)\,dt + \sqrt{2}\,d\overleftarrow{W}_t.
+$$<p>Therefore, if the score of a target density is known (or well estimated), Langevin dynamics can be used to sample from the target distribution without introducing any forward diffusion. In practice, one discretizes the SDE, yielding the unadjusted Langevin algorithm
+</p>
+$$
+x_{k+1} = x_k + \varepsilon\, s_\theta(x_k) + \sqrt{2\varepsilon}\,\xi_k,
+\qquad \xi_k\sim\mathcal N(0,I),
+$$<p>
+where $ s_\theta \approx \nabla \log p_{\text{target}} $.</p>
+<p>However, this approach comes with several practical limitations in exploration of difficult distribution or with the ergodicity hypothesis. This part is not discussed in this article.</p>
+<p>These issues motivate variants such as MALA (Metropolis-adjusted Langevin), preconditioning, or annealed/tempered Langevin schemes to improve robustness and exploration.</p>
+<h5 id="define-a-velocity-fokkerplanck">Define a velocity: Fokker–Planck</h5>
+<p>To keep pushing the transport viewpoint, it helps to give a name to what is actually “moving”: the probability mass itself. This is where the Fokker&ndash;Planck equation becomes really handy.</p>
+<p>An SDE defines a whole path of distributions $\{q_t\}_{t\in[0,1]}$. So, even if we do not track individual particles, we can still describe how the density flows over time. Under the usual smoothness assumptions and assuming $\overleftarrow X_t$ admits a density, we can write a PDE for $q_t$, the density of $\overleftarrow X_t$. We look at the simple isotropic case
+</p>
+$$
+a(\overleftarrow X_t,t) = -\lambda(t), \qquad b(\overleftarrow X_t,t)=g(t)\,I.
+$$<p>
+The corresponding Fokker&ndash;Planck equation is
+</p>
+$$
+\partial_t q_t(x)=\lambda(t)\cdot\nabla q_t(x)+\frac12\,g(t)^2\,\Delta q_t(x).
+$$<p>A good way to read this equation is to rewrite it as a conservation law:
+</p>
+$$
+\partial_t q_t(x) = -\nabla\cdot j_t(x),
+$$<p>
+for some probability current $j_t$. In this setting, the current is
+</p>
+$$
+j_t(x) = -\lambda(t)\,q_t(x)\;-\;\frac12\,g(t)^2\,\nabla q_t(x).
+$$<p>This expression is nice because it splits into two effects you can almost picture:</p>
+<ul>
+<li>
+<p>$j_{\mathrm{drift}}(t,x) = -\lambda(t)\,q_t(x)$.<br>
+This is the “bulk motion” coming from the drift. Since $\lambda(t)$ does not depend on $x$, it just pushes the whole density in the direction $-\lambda(t)$.</p>
+</li>
+<li>
+<p>$j_{\mathrm{diff}}(t,x) = -\frac12\,g(t)^2\,\nabla q_t(x)$.<br>
+This is diffusion: probability leaks from where $q_t$ is large toward where it is small. The larger $g(t)$ is, the more aggressively the density spreads and smooths out.</p>
+</li>
+</ul>
+<p>If we want an actual velocity field, we can divide the current by the density (wherever $q_t(x)>0$):
+</p>
+$$
+v_t(x) := \frac{j_t(x)}{q_t(x)}
+= -\lambda(t) - \frac12\,g(t)^2\,\nabla\log q_t(x).
+$$<p>
+Then Fokker&ndash;Planck becomes
+</p>
+$$
+\partial_t q_t(x) = -\nabla\cdot\big(q_t(x)\,v_t(x)\big),
+$$<p>
+which is literally the physics continuity equation: mass is conserved, and it moves with velocity $v_t$.</p>
+<p>Why bother with $j_t$ or $v_t$? Because it gives a concrete object to compare. Instead of only looking at endpoints $q_0$ and $q_1$, we can look at how a model transports mass at each time. That is exactly the kind of thing we will need later when we want to talk about “how close” a given generative transport is to an optimal one.</p>
+<h4 id="ode-dynamic">ODE dynamic</h4>
+<h5 id="define-a-velocity-continuity-equation">Define a velocity: Continuity equation</h5>
+<h5 id="ode-probability-flow">ODE Probability flow</h5>
+<h5 id="continuous-normalizing-flows">Continuous Normalizing Flows</h5>
+<h3 id="use-the-learnt-dynamic-to-transport">Use the learnt dynamic to transport</h3>
+<h5 id="time-discretization-and-step-schedule">Time discretization and step schedule</h5>
+<h5 id="euler-maruyama-sde">Euler-Maruyama (SDE)</h5>
+<h5 id="ode-solvers-euler--higher-order">ODE solvers (Euler / higher-order)</h5>
+<h5 id="predictorcorrector-sampling">Predictor–corrector sampling</h5>
+<h5 id="deterministic-vs-stochastic-sampling">Deterministic vs stochastic sampling</h5>
+<h5 id="numerical-stability-and-simple-safeguards">Numerical stability and simple safeguards</h5>
+<h5 id="sampling-when-the-reverse-is-explicit">Sampling when the reverse is explicit</h5>
+<h2 id="add-optimality">Add optimality</h2>
+<h3 id="shrodinger-bridge">Shrodinger Bridge</h3>
+<h3 id="rectified-flow">Rectified flow</h3>
+<h3 id="score-based-modeling">Score-based modeling</h3>
+<p>Assume that $p_{\text{data}}$ admits a (smooth) density on $\mathbb{R}^d$. Its score is defined as
+</p>
+$$
+s^*(x) \;=\; \nabla_x \log p_{\text{data}}(x).
+$$<p>Intuitively, $s^*(x)$ gives the direction of steepest increase of the log-density, i.e. it points locally toward regions where $p_{\text{data}}$ is larger.
+Another reason to focus on the score is that it does not depend on the (often intractable) normalization constant of the data density $p_{\text{data}}$.</p>
+<p>A key point in score-based modeling is that we can learn an approximation $s_\theta(x)$ of $s^*(x)$ using only $\hat p_{\text{data}}$. This family of methods is called score matching, and in practice $s_\theta$ is often parameterized by a neural network.</p>
+</div>
+    </article>
+
+    
+</body>
+</html>

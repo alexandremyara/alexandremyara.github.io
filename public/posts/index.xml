@@ -6,8 +6,15 @@
     <description>Recent content in Posts on Alexandre MYARA</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 28 Oct 2024 07:07:07 +0100</lastBuildDate>
+    <lastBuildDate>Sat, 28 Dec 2024 14:18:00 +0100</lastBuildDate>
     <atom:link href="http://localhost:1313/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Energy based Model</title>
+      <link>http://localhost:1313/posts/rbm_blog_en/</link>
+      <pubDate>Sat, 28 Dec 2024 14:18:00 +0100</pubDate>
+      <guid>http://localhost:1313/posts/rbm_blog_en/</guid>
+      <description>&lt;h1 id=&#34;energy-based-model&#34;&gt;Energy based model&lt;/h1&gt;&#xA;&lt;p&gt;Les modèles classiques de machine learning reposent souvent sur des hypothèses sur la forme des données.&#xA;Par exemple les modèles type VAE forcent la distribution encodeur à s&amp;rsquo;approcher d&amp;rsquo;une gausienne.&lt;/p&gt;&#xA;&lt;p&gt;L&amp;rsquo;idée générale est, une fois une distribution hypothèse fixée, d&amp;rsquo;ajuster différents paramètres jusqu&amp;rsquo;à obtenir une distribution optimale selon une fonction objectif ou de calculer les paramètres directement à partir des données lorsque cela est possible.&lt;/p&gt;&#xA;&lt;p&gt;Ces méthodes sont performantes mais peuvent avoir des coûts de calculs importants dans des espaces à grandes dimensions ou sont directement limitées par les données à disposition.&lt;/p&gt;</description>
+    </item>
     <item>
       <title>VAE</title>
       <link>http://localhost:1313/posts/vae_blog_en/</link>
@@ -24,10 +31,24 @@
     </item>
     <item>
       <title></title>
-      <link>http://localhost:1313/posts/vqa/vqa_fr/</link>
+      <link>http://localhost:1313/posts/cfg_blog_en/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/posts/vqa/vqa_fr/</guid>
-      <description>&lt;h1 id=&#34;evolutions-des-méthodes-de-visual-question-answering&#34;&gt;Evolutions des méthodes de Visual Question Answering&lt;/h1&gt;</description>
+      <guid>http://localhost:1313/posts/cfg_blog_en/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title></title>
+      <link>http://localhost:1313/posts/gen_transport/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/gen_transport/</guid>
+      <description>&lt;h1 id=&#34;understanding-generative-modeling-through-transport-theory&#34;&gt;Understanding Generative Modeling through transport theory&lt;/h1&gt;&#xA;&lt;p&gt;A general idea behind generative modeling is to approximate an unknown distribution $p_{\text{data}}$ by a learnable distribution $p_\theta$.&lt;/p&gt;&#xA;&lt;p&gt;At the beginning, the only thing we have is a finite sample from $p_{\text{data}}$, i.e. a dataset $\mathcal{D}=\{x_i\}_{i=1}^N$, which defines the empirical (discrete) distribution&#xA;&lt;/p&gt;&#xA;$$&#xA;\hat p_{\text{data}} \;=\; \frac{1}{N}\sum_{i=1}^N \delta_{x_i}.&#xA;$$&lt;p&gt;Several ideas have been proposed to approximate $p_{\text{data}}$. A major one is the variational autoencoder (VAE) introduced by Kingma &amp;amp; Welling (2013), which learns a latent-variable model. One assumes a prior $p(z)$ and a decoder (generative) distribution $p_\theta(x\mid z)$, so that the model distribution is&#xA;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title></title>
+      <link>http://localhost:1313/posts/ot_blog_en/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/ot_blog_en/</guid>
+      <description></description>
     </item>
   </channel>
 </rss>

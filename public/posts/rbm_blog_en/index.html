@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+
+<link rel="icon" type="image/png" href="icon/icon.png">
+<title>Energy based Model</title>
+
+
+
+    <link rel="stylesheet" href="/css/posts.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+
+<br><br>    
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+
+<br><br>    
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"
+        onload="renderMathInElement(document.body);"></script>
+
+<br><br>    <script>document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+            
+            delimiters: [
+                            {left: "$$", right: "$$", display: true},
+                            {left: "$", right: "$", display: false}
+                        ]
+            });
+        });
+    </script>
+</head>
+<body>
+    
+        <header>
+<a href="/"> back to home</a>
+</header>
+
+    
+    
+    <article>
+        <div><h1 id="energy-based-model">Energy based model</h1>
+<p>Les modèles classiques de machine learning reposent souvent sur des hypothèses sur la forme des données.
+Par exemple les modèles type VAE forcent la distribution encodeur à s&rsquo;approcher d&rsquo;une gausienne.</p>
+<p>L&rsquo;idée générale est, une fois une distribution hypothèse fixée, d&rsquo;ajuster différents paramètres jusqu&rsquo;à obtenir une distribution optimale selon une fonction objectif ou de calculer les paramètres directement à partir des données lorsque cela est possible.</p>
+<p>Ces méthodes sont performantes mais peuvent avoir des coûts de calculs importants dans des espaces à grandes dimensions ou sont directement limitées par les données à disposition.</p>
+<p>Une idée est de sintéresser à comment la nature fonctionne.
+Prenons l&rsquo;exemple d&rsquo;une balle lancée sur Terre.</p>
+<p><img src="/image/energy/pomme.png" alt="">
+Afin d&rsquo;inférer la trajectoire $y$ de la pomme à partir des informations initiales $x$, la physique ne nous force pas à utiliser des algorithmes nécessitant de parcourir l&rsquo;espace des trajectoires possibles.
+Les lois de la physique choisissent simplement la courbe qui minimise l&rsquo;énergie mécanique totale.
+L&rsquo;expression de cette énergie est parfaitement connue à chaque instant </p>
+$$\mathcal{E} = \frac 1 2 .mv^2 + mgy$$<p> et donc la forme de la trajectoire optimale en découle directement.
+<img src="/image/energy/ep.png" alt="alt text"></p>
+<p>On a donc mis en évidence le fait que l&rsquo;inférence de $y$ grâce à $x$ passe par une minimisation d&rsquo;une fonction qui a l&rsquo;avantage de ne pas nécessiter d&rsquo;approximation sur la forme des données, ni même de requerir un label de $x$.</p>
+<p>Pour appliquer cette idée au machine learning il faudrait disposer d&rsquo;une fonction &ldquo;énergie&rdquo; qu&rsquo;il suffirait de minimiser afin d&rsquo;inférer une sortie $y$ connaissant une entrée $x$.</p>
+<p>Chaque problème de machine learning évolue dans son propre espace qui est induit par les données à disposition.
+Ainsi la tâche d&rsquo;entrainement ne serait pas de trouver des poids optimaux à l&rsquo;aide d&rsquo;une fonction de perte mais de déterminer une fonction énergie optimale pour le problème.</p>
+<p>Cet article présentera différentes solutions de fonction énergie et les méthodes pour les optimiser.</p>
+<h2 id="hopfiled-networks">Hopfiled Networks</h2>
+<p>Le précurseur des modèles energy-based sont les <code>Hopfield Networks</code>.
+L&rsquo;idée est d&rsquo;avoir un système dit &ldquo;dynamique&rdquo; afin d&rsquo;inférer une donnée $y$ à l&rsquo;aide d&rsquo;une donnée $x$.</p>
+<p>Le cas d&rsquo;application principal est la reconstruction de données binaires.
+Par exemple : je donne une image binaire de A légérement modifiée en entrée.
+Le modèle doit être capable de &ldquo;réparer&rdquo; l&rsquo;image est de donner un A complet en sortie.</p>
+<p>Ce genre de modèle est un exemple de mémoire associative.
+Il retient des motifs pour être capable de reconnaitre des motifs même incomplet (à la manière d&rsquo;un cerveau humain).</p>
+<p>Posons le cadre mathématiques.
+On considère des images binaires $\{x^0, x^1, \text{...}, x^p\}$ chacune de taille $N \times N$.</p>
+<p>L&rsquo;idée est d&rsquo;utiliser un graphe non-orienté à $N$ noeuds pondérés par $W$ de taille $N \times N$ pour représenter les données.
+Chaque noeud $i$ porte une valeur $x_i$ à $+1$ ou $-1$ (représentant la valeur du pixel binaire).</p>
+<p>Afin de représenter la capacité qu&rsquo;ont deux noeuds à être identique ou non on considère le produit x_i.x_j.
+On construit la matrice de poids $W$ où $w_{i,j}= \frac 1 P \sum_{k=0}^Px^k_i x^k_j$.
+On interprète le poids $w_{i,j}$ comme la mesure moyenne de la capacité qu&rsquo;ont deux noeuds à être identiques.</p>
+<p>Si $w_{i,j} \gt 0$ alors les noeuds $i$ et $j$ ont tendance à être identiques.</p>
+<p>L&rsquo;idée est d&rsquo;être capable de retrouver un motif retenu en donnant un motif incomplet au réseau.
+On considère que le réseau de Hopfield a retenu une partie des $P$ motifs.</p>
+<p>On condière une nouvelle entrée $x^{p+1}$. On charge les $x_i^{p+1}$ sur le graphe.
+L&rsquo;objectif est d&rsquo;ajuster $x^{p+1}$ de manière à retrouver le motif le plus proche.</p>
+<p>Considérons une connexion entre $x_i^{p+1}$ et $x_j^{p+1}$.
+Le poids $w_{i,j}$ est connu.</p>
+<p>Si $w_{i,j} \gt 0$ on peut s&rsquo;attendre à ce que $x_i^{p+1}$ et $x_j^{p+1}$ soient de même signe.
+On considère donc le produit $w_{i,j}.x_i^{p+1}.x_j^{p+1}$.
+L&rsquo;objectif est donc que ce produit soit positif (et le plus grand possible).</p>
+<p>On ajuste alors les différentes valeurs de $x^{p+1}$ itérativement de manière à maximiser ce produit.</p>
+<p>Le calcul du nouvel état du neuronne se fait par
+</p>
+$$x_i(t+1) =
+\begin{cases} 
+1 & \text{si } \sum_j w_{ij} x_j > 0, \\
+-1 & \text{sinon.}
+\end{cases}$$<p>Si on génèralise cette contraine à tout le réseau on obtient que résoudre notre problème revient à maximiser $\sum_{i=0}^P w_{i,j}.x_i x_j$.
+Il suffit donc de minimser cette fonction avec un $-$.
+La fonction énergie pour ce modèle est : </p>
+$$\mathcal E(x) = -\sum_{i=0}^P w_{i,j}.x_i x_j $$<p>Le parallèle avec l&rsquo;énergie en physique est fort. Les motifs mémorisés sont des minima locaux de cette fonction $\mathcal E$.
+Lorsqu&rsquo;on passe une entrée $x$, elle descend la courbe d&rsquo;énergie jusqu&rsquo;au minimum local le plus proche. Le système atteint alors un équilibre : il s&rsquo;agit de la sortie $y$, le motif complet prédit.</p>
+<p>Les Hopfield Networks ont pour limite que pour $N$ noeuds, ils ne retiennent entre $0.14N$ en $0.15N$ motifs.
+Au delà, des états stables (minima d&rsquo;energie $\mathcal E$) ne corespondant à aucun motif apparaissent.</p>
+<h2 id="différence-avec-une-fonction-de-perte-classique">Différence avec une fonction de perte classique</h2>
+<p>Maintenant que nous avons vu une premier exemple de modèle basé sur une fonction énérgie une question essentielle peut se poser.
+<strong>L&rsquo;energie n&rsquo;est-elle alors pas simplement une fonction de perte ?</strong></p>
+<p>La différence apportée par l&rsquo;énergie est que l&rsquo;énergie est utilisée à la fois à l&rsquo;entrainement et à l&rsquo;inférence.
+Pendant la phase d&rsquo;entrainement la fonction d&rsquo;énérgie est construite.
+Pendant l&rsquo;inférence elle est utilisée puisqu&rsquo;elle tente d&rsquo;atteindre un état final avec énergie minimale.
+Le modèle est dit dynamique : il évolue même pendant l&rsquo;inférence (là où un réseau de neuronne supervisé classique est figé une fois ses poids appris).</p>
+<p>Par ailleurs l&rsquo;énergie ne mesure pas une différentre la sortie prédite $\hat y$ et un label $y$.
+Ces fonctions fonctionnent également en non-supervisé puisque l&rsquo;idée est simplement de donner au système un état stable (ce qui correspond à une énergie minimale).</p>
+<h2 id="un-modèle-basé-énergie-génératif--restricted-boltzmann-machine-rbm">Un modèle basé énergie génératif : Restricted Boltzmann Machine (RBM)</h2>
+</div>
+    </article>
+
+    
+</body>
+</html>
