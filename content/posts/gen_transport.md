@@ -39,7 +39,7 @@ We have selected two popular examples of static transport: GAN (Generative Adver
 
 ### GAN
 
-The neural network vision of a GAN is two networks train in competition. A ``generator`` $G_\theta(z)$ produces synthetic images from noise and a ``discriminator`` $D_\phi(\codt)$.
+The neural network vision of a GAN is two networks train in competition. A ``generator`` $G_\theta(z)$ produces synthetic images from noise and a ``discriminator`` $D_\phi(\cdot)$.
 We feed the discriminator with synthetic images from $G$ and with real images from $\hat p_\text{data}$. The network $D$ try to infer wheter or not its inputs are synthetic or real. 
 
 {{< figure caption="Figure — Simple GAN Architecture." >}}
@@ -75,25 +75,39 @@ D^*(x) = \frac {p_\text{data}(x)}  {p_\text{data}(x) + {G_\theta}_\#\,\tilde p(x
 $$
 We reinject this optimum and find that:
 $$\mathcal L(D^*, G_\theta) = -\log 4 + \textrm{KL}(p_\text{data}\mid\mid m) + \textrm{KL}({G_\theta}_\#\,\tilde p \mid\mid m), \qquad \text{ where }2m = p_\text{data}+ {G_\theta}_\#\,\tilde p$$
-Then the objective one our transport is an optimization in the transport application space with Jensen distance as metric.
+Then the objective on our transport is an optimization in the transport application space with Jensen distance as metric.
 
 This appears to be the Jensen-Shannon divergence, $\textrm{JS}$. This formulation helps to see that GAN are not only an association of neural networks but a real optimization on a push-forward noise to data, in the case of a discriminator perfectly optimized.
+
+{{<conclusionBlock>}}
 The final objective in this case is :
 $$
 \min_G \textrm{JS}(p_\text{data}\mid\mid {G_\theta}_\#\,\tilde p)
 $$
+{{</conclusionBlock>}}
 
 This formulation tries to give a theoric objective. In pratice $D$ is not perfectly optimized and $G$ doesn't follow stricly a minimal $\textrm{JS}$ curve but a neural divergence induced by the network. With a finite capacity for $D$, the class of function possible for $D$, denote $\mathcal F$, is restraint. The neural divergence is not defined from $D^*$ but from a $\sup$ on $\mathcal F$. 
 
 $$
-\mathcal d(p_\text{data}, {G_\theta}_\#\,\tilde p) =\sup_{D\in\mathcal F}\;
+\mathcal d(p_\text{data} \mid \mid {G_\theta}_\#\,\tilde p) =\sup_{D\in\mathcal F}\;
 \mathbb E_{x\sim p_{\text{data}}}\!\big[\log D(x)\big]
 \;+\;
 \mathbb E_{x\sim {G_\theta}_\#\,\tilde p}\!\big[\log\big(1-D(x)\big)\big],
 \qquad
 $$
 
+
+{{<conclusionBlock>}}
+GAN are then a transport optimisation under :
+
+$$
+\min_{G_\theta} d(p_\text{data} || {G_\theta}_\# \, \tilde p)
+$$
+{{</conclusionBlock>}}
+
 ### Normalizing flows
+
+
 ### Limit of static transport
 
 The “static” viewpoint targets a final push-forward relation $(T_\theta)_\# \tilde p \approx p_{\text{data}}$ and focuses on learning (or parameterizing) a transformation that achieves this match. Even when $T_\theta$ is implemented as a composition of simpler maps (as in normalizing flows), the emphasis remains on the existence of a single overall transport that connects $\tilde p$ to the data distribution.

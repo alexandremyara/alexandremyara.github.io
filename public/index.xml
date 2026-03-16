@@ -1,54 +1,23 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>Alexandre MYARA</title>
-    <link>http://localhost:1313/</link>
-    <description>Recent content on Alexandre MYARA</description>
-    <generator>Hugo</generator>
-    <language>en-us</language>
-    <lastBuildDate>Sat, 28 Dec 2024 14:18:00 +0100</lastBuildDate>
-    <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>Energy based Model</title>
-      <link>http://localhost:1313/posts/rbm_blog_en/</link>
-      <pubDate>Sat, 28 Dec 2024 14:18:00 +0100</pubDate>
-      <guid>http://localhost:1313/posts/rbm_blog_en/</guid>
-      <description>&lt;h1 id=&#34;energy-based-model&#34;&gt;Energy based model&lt;/h1&gt;&#xA;&lt;p&gt;Les modèles classiques de machine learning reposent souvent sur des hypothèses sur la forme des données.&#xA;Par exemple les modèles type VAE forcent la distribution encodeur à s&amp;rsquo;approcher d&amp;rsquo;une gausienne.&lt;/p&gt;&#xA;&lt;p&gt;L&amp;rsquo;idée générale est, une fois une distribution hypothèse fixée, d&amp;rsquo;ajuster différents paramètres jusqu&amp;rsquo;à obtenir une distribution optimale selon une fonction objectif ou de calculer les paramètres directement à partir des données lorsque cela est possible.&lt;/p&gt;&#xA;&lt;p&gt;Ces méthodes sont performantes mais peuvent avoir des coûts de calculs importants dans des espaces à grandes dimensions ou sont directement limitées par les données à disposition.&lt;/p&gt;</description>
-    </item>
-    <item>
-      <title>VAE</title>
-      <link>http://localhost:1313/posts/vae_blog_en/</link>
-      <pubDate>Mon, 28 Oct 2024 07:07:07 +0100</pubDate>
-      <guid>http://localhost:1313/posts/vae_blog_en/</guid>
-      <description>&lt;h1 id=&#34;from-variational-inference-to-variational-auto-encoder-vae-and-more&#34;&gt;From Variational Inference to Variational Auto Encoder (VAE) and more&lt;/h1&gt;&#xA;&lt;p&gt;In recent articles about data generation, the state of the art appears to be achieved by models based on the &lt;code&gt;Variational Auto Encoder&lt;/code&gt;.&#xA;To understand this model, we need to delve into two key concepts: &lt;code&gt;Variational Inference&lt;/code&gt; (VI) and &lt;code&gt;Auto Encoder&lt;/code&gt; (AE).&lt;/p&gt;&#xA;&lt;h4 id=&#34;summary&#34;&gt;&lt;strong&gt;Summary&lt;/strong&gt;&lt;/h4&gt;&#xA;&lt;h5 id=&#34;i-variational-inference--elbo-cavi-and-bbvi&#34;&gt;I. Variational Inference : ELBO, CAVI and BBVI&lt;/h5&gt;&#xA;&lt;h5 id=&#34;ii-auto-encoders--theory-and-applications&#34;&gt;II. Auto-Encoders : Theory and applications&lt;/h5&gt;&#xA;&lt;h5 id=&#34;iii-variational-auto-encoders--vae-beta-vae-cvae-vq-vae-hierarchical-vae&#34;&gt;III. Variational Auto-Encoders : VAE, $\beta$-VAE, CVAE, VQ-VAE, Hierarchical VAE&lt;/h5&gt;&#xA;&lt;h3 id=&#34;context&#34;&gt;Context&lt;/h3&gt;&#xA;&lt;p&gt;Consider a dataset $\mathcal{D}$ of images, where $x$ denotes a unique sample of $\mathcal{D}$.&lt;/p&gt;</description>
-    </item>
-    <item>
-      <title>How to Construct Multimodal Datasets Efficiently?</title>
-      <link>http://localhost:1313/posts/dataset_blog_en/</link>
-      <pubDate>Thu, 01 Aug 2024 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/posts/dataset_blog_en/</guid>
-      <description>&lt;h1 id=&#34;the-importance-of-the-dataset&#34;&gt;The Importance of the Dataset&lt;/h1&gt;&#xA;&lt;p&gt;&lt;img src=&#34;http://localhost:1313/image/dataset/image-3.png&#34; alt=&#34;alt text&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;When tackling a deep learning problem, it&amp;rsquo;s common to instinctively modify an existing architecture to fit the task or even consider designing a new one from scratch.&lt;/p&gt;&#xA;&lt;p&gt;As highlighted in &lt;a href=&#34;https://nonint.com/2023/06/10/the-it-in-ai-models-is-the-dataset/&#34;&gt;The &amp;lsquo;it&amp;rsquo; in AI models is the dataset&lt;/a&gt;, the most significant lever to improve deep learning models relies in the training data rather than the architecture itself. Having data that is well-suited to a precise use case can significantly improve performance of the model for this use case.&lt;/p&gt;</description>
-    </item>
-    <item>
-      <title></title>
-      <link>http://localhost:1313/posts/cfg_blog_en/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/posts/cfg_blog_en/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title></title>
-      <link>http://localhost:1313/posts/gen_transport/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/posts/gen_transport/</guid>
-      <description>&lt;h1 id=&#34;understanding-generative-modeling-through-transport-theory&#34;&gt;Understanding Generative Modeling through transport theory&lt;/h1&gt;&#xA;&lt;p&gt;A general idea behind generative modeling is to approximate an unknown distribution $p_{\text{data}}$ by a learnable distribution $p_\theta$.&lt;/p&gt;&#xA;&lt;p&gt;At the beginning, the only thing we have is a finite sample from $p_{\text{data}}$, i.e. a dataset $\mathcal{D}=\{x_i\}_{i=1}^N$, which defines the empirical (discrete) distribution&#xA;&lt;/p&gt;&#xA;$$&#xA;\hat p_{\text{data}} \;=\; \frac{1}{N}\sum_{i=1}^N \delta_{x_i}.&#xA;$$&lt;p&gt;Several ideas have been proposed to approximate $p_{\text{data}}$. A major one is the variational autoencoder (VAE) introduced by Kingma &amp;amp; Welling (2013), which learns a latent-variable model. One assumes a prior $p(z)$ and a decoder (generative) distribution $p_\theta(x\mid z)$, so that the model distribution is&#xA;&lt;/p&gt;</description>
-    </item>
-    <item>
-      <title></title>
-      <link>http://localhost:1313/posts/ot_blog_en/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/posts/ot_blog_en/</guid>
-      <description></description>
-    </item>
-  </channel>
-</rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Alexandre MYARA</title><link>https://alexandremyara.github.io/</link><description>Recent content on Alexandre MYARA</description><generator>Hugo</generator><language>en-us</language><lastBuildDate>Sat, 28 Dec 2024 14:18:00 +0100</lastBuildDate><atom:link href="https://alexandremyara.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>Energy based Model</title><link>https://alexandremyara.github.io/posts/rbm_blog_en/</link><pubDate>Sat, 28 Dec 2024 14:18:00 +0100</pubDate><guid>https://alexandremyara.github.io/posts/rbm_blog_en/</guid><description>&lt;h1 id="energy-based-model">Energy based model&lt;/h1>
+&lt;p>Les modèles classiques de machine learning reposent souvent sur des hypothèses sur la forme des données.
+Par exemple les modèles type VAE forcent la distribution encodeur à s&amp;rsquo;approcher d&amp;rsquo;une gausienne.&lt;/p>
+&lt;p>L&amp;rsquo;idée générale est, une fois une distribution hypothèse fixée, d&amp;rsquo;ajuster différents paramètres jusqu&amp;rsquo;à obtenir une distribution optimale selon une fonction objectif ou de calculer les paramètres directement à partir des données lorsque cela est possible.&lt;/p>
+&lt;p>Ces méthodes sont performantes mais peuvent avoir des coûts de calculs importants dans des espaces à grandes dimensions ou sont directement limitées par les données à disposition.&lt;/p></description></item><item><title>VAE</title><link>https://alexandremyara.github.io/posts/vae_blog_en/</link><pubDate>Mon, 28 Oct 2024 07:07:07 +0100</pubDate><guid>https://alexandremyara.github.io/posts/vae_blog_en/</guid><description>&lt;h1 id="from-variational-inference-to-variational-auto-encoder-vae-and-more">From Variational Inference to Variational Auto Encoder (VAE) and more&lt;/h1>
+&lt;p>In recent articles about data generation, the state of the art appears to be achieved by models based on the &lt;code>Variational Auto Encoder&lt;/code>.
+To understand this model, we need to delve into two key concepts: &lt;code>Variational Inference&lt;/code> (VI) and &lt;code>Auto Encoder&lt;/code> (AE).&lt;/p>
+&lt;h4 id="summary">&lt;strong>Summary&lt;/strong>&lt;/h4>
+&lt;h5 id="i-variational-inference--elbo-cavi-and-bbvi">I. Variational Inference : ELBO, CAVI and BBVI&lt;/h5>
+&lt;h5 id="ii-auto-encoders--theory-and-applications">II. Auto-Encoders : Theory and applications&lt;/h5>
+&lt;h5 id="iii-variational-auto-encoders--vae-beta-vae-cvae-vq-vae-hierarchical-vae">III. Variational Auto-Encoders : VAE, $\beta$-VAE, CVAE, VQ-VAE, Hierarchical VAE&lt;/h5>
+&lt;h3 id="context">Context&lt;/h3>
+&lt;p>Consider a dataset $\mathcal{D}$ of images, where $x$ denotes a unique sample of $\mathcal{D}$.&lt;/p></description></item><item><title>How to Construct Multimodal Datasets Efficiently?</title><link>https://alexandremyara.github.io/posts/dataset_blog_en/</link><pubDate>Thu, 01 Aug 2024 00:00:00 +0000</pubDate><guid>https://alexandremyara.github.io/posts/dataset_blog_en/</guid><description>&lt;h1 id="the-importance-of-the-dataset">The Importance of the Dataset&lt;/h1>
+&lt;p>&lt;img src="https://alexandremyara.github.io/image/dataset/image-3.png" alt="alt text">&lt;/p>
+&lt;p>When tackling a deep learning problem, it&amp;rsquo;s common to instinctively modify an existing architecture to fit the task or even consider designing a new one from scratch.&lt;/p>
+&lt;p>As highlighted in &lt;a href="https://nonint.com/2023/06/10/the-it-in-ai-models-is-the-dataset/">The &amp;lsquo;it&amp;rsquo; in AI models is the dataset&lt;/a>, the most significant lever to improve deep learning models relies in the training data rather than the architecture itself. Having data that is well-suited to a precise use case can significantly improve performance of the model for this use case.&lt;/p></description></item><item><title/><link>https://alexandremyara.github.io/posts/cfg_blog_en/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://alexandremyara.github.io/posts/cfg_blog_en/</guid><description/></item><item><title/><link>https://alexandremyara.github.io/posts/gen_transport/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://alexandremyara.github.io/posts/gen_transport/</guid><description>&lt;h1 id="understanding-generative-modeling-through-transport-theory">Understanding Generative Modeling through transport theory&lt;/h1>
+&lt;p>A general idea behind generative modeling is to approximate an unknown distribution $p_{\text{data}}$ by a learnable distribution $p_\theta$.&lt;/p>
+&lt;p>At the beginning, the only thing we have is a finite sample from $p_{\text{data}}$, i.e. a dataset $\mathcal{D}=\{x_i\}_{i=1}^N$, which defines the empirical (discrete) distribution
+&lt;/p>
+$$
+\hat p_{\text{data}} \;=\; \frac{1}{N}\sum_{i=1}^N \delta_{x_i}.
+$$&lt;p>Several ideas have been proposed to approximate $p_{\text{data}}$. A major one is the variational autoencoder (VAE) introduced by Kingma &amp;amp; Welling (2013), which learns a latent-variable model. One assumes a prior $p(z)$ and a decoder (generative) distribution $p_\theta(x\mid z)$, so that the model distribution is
+&lt;/p></description></item><item><title/><link>https://alexandremyara.github.io/posts/ot_blog_en/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://alexandremyara.github.io/posts/ot_blog_en/</guid><description/></item></channel></rss>
