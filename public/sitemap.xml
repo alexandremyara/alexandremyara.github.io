@@ -1,1 +1,30 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml"><url><loc>https://alexandremyara.github.io/</loc><lastmod>2024-12-28T14:18:00+01:00</lastmod></url><url><loc>https://alexandremyara.github.io/posts/rbm_blog_en/</loc><lastmod>2024-12-28T14:18:00+01:00</lastmod></url><url><loc>https://alexandremyara.github.io/posts/</loc><lastmod>2024-12-28T14:18:00+01:00</lastmod></url><url><loc>https://alexandremyara.github.io/posts/vae_blog_en/</loc><lastmod>2024-10-28T07:07:07+01:00</lastmod></url><url><loc>https://alexandremyara.github.io/posts/dataset_blog_en/</loc><lastmod>2024-08-01T00:00:00+00:00</lastmod></url><url><loc>https://alexandremyara.github.io/posts/cfg_blog_en/</loc></url><url><loc>https://alexandremyara.github.io/posts/gen_transport/</loc></url><url><loc>https://alexandremyara.github.io/posts/ot_blog_en/</loc></url><url><loc>https://alexandremyara.github.io/categories/</loc></url><url><loc>https://alexandremyara.github.io/tags/</loc></url></urlset>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>http://localhost:1313/</loc>
+    <lastmod>2024-12-28T14:18:00+01:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/posts/rbm_blog_en/</loc>
+    <lastmod>2024-12-28T14:18:00+01:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/posts/</loc>
+    <lastmod>2024-12-28T14:18:00+01:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/posts/vae_blog_en/</loc>
+    <lastmod>2024-10-28T07:07:07+01:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/posts/dataset_blog_en/</loc>
+    <lastmod>2024-08-01T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/posts/cfg_blog_en/</loc>
+  </url><url>
+    <loc>http://localhost:1313/posts/gen_transport/</loc>
+  </url><url>
+    <loc>http://localhost:1313/posts/ot_blog_en/</loc>
+  </url><url>
+    <loc>http://localhost:1313/categories/</loc>
+  </url><url>
+    <loc>http://localhost:1313/tags/</loc>
+  </url>
+</urlset>

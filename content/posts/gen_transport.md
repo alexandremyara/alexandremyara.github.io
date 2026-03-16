@@ -24,8 +24,8 @@ $$
 (T_\theta)_\# \tilde p \approx p_{\text{data}}.
 $$
 
-{{< figure caption="Figure — Simple GAN Architecture." >}}
-![alt](/image/transport/transport.png)
+{{< figure caption="Figure — Generative modeling is a transport." >}}
+![alt](/image/transport/transport1.png)
 {{< /figure >}}
 
 **In other words, generation can be seen as moving probability mass from an easy distribution to $p_{\text{data}}$.**
@@ -43,7 +43,7 @@ The neural network vision of a GAN is two networks train in competition. A ``gen
 We feed the discriminator with synthetic images from $G$ and with real images from $\hat p_\text{data}$. The network $D$ try to infer wheter or not its inputs are synthetic or real. 
 
 {{< figure caption="Figure — Simple GAN Architecture." >}}
-![alt](/image/transport/gan.png)
+![alt](/image/transport/gan1.png)
 {{< /figure >}}
 
 
@@ -106,7 +106,10 @@ $$
 {{</conclusionBlock>}}
 
 ### Normalizing flows
+An other way to transport a distribution is by learning normalizing flows.
+The idea this time is to learn explicitly the transport application with an invertible constrainst.
 
+In GAN we try to descent through a distance (like Jensen distance) to approach a stastifying transport. However this application
 
 ### Limit of static transport
 
