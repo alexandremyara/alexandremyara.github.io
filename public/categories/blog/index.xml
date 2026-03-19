@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Blog on Alexandre MYARA</title>
+    <link>http://localhost:1313/categories/blog/</link>
+    <description>Recent content in Blog on Alexandre MYARA</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 19 Mar 2026 10:30:00 +0100</lastBuildDate>
+    <atom:link href="http://localhost:1313/categories/blog/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Mon premier article</title>
+      <link>http://localhost:1313/posts/gen_transport/</link>
+      <pubDate>Thu, 19 Mar 2026 10:30:00 +0100</pubDate>
+      <guid>http://localhost:1313/posts/gen_transport/</guid>
+      <description>&lt;h1 id=&#34;understanding-generative-modeling-through-transport-theory&#34;&gt;Understanding Generative Modeling through transport theory&lt;/h1&gt;&#xA;&lt;p&gt;Generative modeling is often understood as the training of a neural network with a well-chosen objective function.&#xA;The key idea is to approximate an unknown distribution $p_{\text{data}}$ by a learnable distribution $p_\theta$. However the objective function doesn&amp;rsquo;t let us see the fact that they optimize a distribution, we only see that we optimize a neural-network.&lt;/p&gt;&#xA;&lt;p&gt;In this article we will explore main generative model by analyze their loss and shows how do they optimize a distribution.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

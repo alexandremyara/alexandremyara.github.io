@@ -1,6 +1,23 @@
 # Understanding Generative Modeling through transport theory
 
-A general idea behind generative modeling is to approximate an unknown distribution $p_{\text{data}}$ by a learnable distribution $p_\theta$.
+Generative modeling is often understood as training a neural network with a well-chosen objective function.
+The key idea is to approximate an unknown distribution $p_{\text{data}}$ with a learnable distribution $p_\theta$. However, the objective function does not really show that we are optimizing a distribution; instead, it mostly looks like we are just optimizing a neural network.
+
+In this article, we will explore the main generative models by analyzing their losses and showing how they optimize a distribution.
+
+{{< figure caption="" >}}
+![alt](/image/transport/head2.png)
+{{< /figure >}}
+
+#### **Summary**
+
+##### **I. Deterministic Transport: GAN and Flows**
+
+##### **II. Stochastic Transport**
+
+##### **III. Let's add optimality**
+
+### Get Started
 
 At the beginning, the only thing we have is a finite sample from $p_{\text{data}}$, i.e. a dataset $\mathcal{D}=\{x_i\}_{i=1}^N$, which defines the empirical (discrete) distribution
 $$
@@ -30,12 +47,12 @@ $$
 
 **In other words, generation can be seen as moving probability mass from an easy distribution to $p_{\text{data}}$.**
 
-## Static transport
-Static transport is the natural formulation of our problem. The key idea is to find an objective to build an application $T$ which transports the noise distribution $\tilde p$ to $p_\text{data}$. 
+## Transport with deterministic path
+Transport with deterministic path is the natural formulation of our problem. The key idea is to find an objective to build an application (or a composition of applications) $T$ which transports the noise distribution $\tilde p$ to $p_\text{data}$. 
 
-The keyword "static" comes in opposition with "dynamic transport", where $T$ is no longer one application but a path in the distribution space (a familly of distribution).
+The keyword "deterministic" comes in opposition with "stochastic transport", where $T$ is no longer an application but a markov kernel.
 
-We have selected two popular examples of static transport: GAN (Generative Adversarial Network) and Normalizing Flows. 
+We have selected two popular examples of deterministic transport: GAN (Generative Adversarial Network) and Normalizing Flows.
 
 ### GAN
 
@@ -106,20 +123,80 @@ $$
 {{</conclusionBlock>}}
 
 ### Normalizing flows
-An other way to transport a distribution is by learning normalizing flows.
-The idea this time is to learn explicitly the transport application with an invertible constrainst.
 
-In GAN we try to descent through a distance (like Jensen distance) to approach a stastifying transport. However this application
+An other way to transport a distribution is by learning normalizing flows.  
+The idea this time is to learn explicitly the transport application with an invertible constraint on the transport application.
 
-### Limit of static transport
+In GAN we try to descent through a distance (like Jensen-Shannon divergence) to approach a satisfying transport.
 
-The “static” viewpoint targets a final push-forward relation $(T_\theta)_\# \tilde p \approx p_{\text{data}}$ and focuses on learning (or parameterizing) a transformation that achieves this match. Even when $T_\theta$ is implemented as a composition of simpler maps (as in normalizing flows), the emphasis remains on the existence of a single overall transport that connects $\tilde p$ to the data distribution.
+**However this application often has no density with respect to the Lebesgue measure. Even if such a density exists, GAN do not impose invertibility and do not provide an exploitable Jacobian. As a consequence, the density induced by the generator is intractable.**
 
-This perspective has a natural limitation: it does not explicitly model how probability mass should evolve along the way. In other words, the intermediate distributions induced by partial compositions are not part of the formulation. This motivates making the transport path explicit by introducing an indexed family of distributions $(q_t)$ and learning a dynamics that progressively moves $\tilde p$ toward $p_{\text{data}}$.
+Normalizing flows take a different point of view. Instead of learning a transport only through a discrepancy between the transported noise and the data distribution, they build a transport map $T_\theta$ such that
 
-## Dynamic transport
+$$
+(T_\theta)_\# \tilde p \approx p_\text{data},
+$$
+with the additional assumption that $T_\theta$ is invertible.
 
-Instead of learning a single map $T_\theta$ that directly pushes $\tilde p$ to $p_{\text{data}}$, the dynamic viewpoint decomposes the transport into a sequence (or a continuum) of simpler transformations. This is done by introducing a family of intermediate distributions $(q_t)$ indexed either by a discrete time $k\in\mathbb{N}$ or a continuous time $t\in[0,1]$, with
+As in GAN, we start from a simple noise distribution $\tilde p$, for example a standard Gaussian, and transport it to the data space. The difference is that here the transport application is constrained enough so that we can explicitly compute the density of the transported law. This is the main strength of flows: they do not only generate samples, they also describe how probability mass is deformed by the transport.
+
+If $z \sim \tilde p$ and $x=T_\theta(z)$, then by construction
+
+$$
+x \sim (T_\theta)_\# \tilde p
+$$
+
+Since $T_\theta$ is invertible, one can also go backward from $x$ to $z=T_\theta^{-1}(x)$. This gives access to the density of the transported distribution through the classical change-of-variable formula:
+
+$$
+p_\theta(x)=
+\tilde p(T_\theta^{-1}(x))
+\left|\det J_{T_\theta^{-1}}(x)\right|.
+$$
+
+This formula is central to the flow point of view. It shows that the learnt map is really a transport application: it moves the reference density $\tilde p$ to a new density $p_\theta$, and the Jacobian determinant tells us how volumes are locally dilated or contracted by the map. In other words, contrary to GAN, the transport is not only implicit through samples, but explicit through densities.
+
+In practice, one does not choose any invertible map, because computing the determinant of a generic Jacobian would be too expensive. The idea is then to build $T_\theta$ as a composition of simple invertible applications:
+$$
+T_\theta = f_K \circ \dots \circ f_1,
+$$
+where each $f_k$ is chosen such that both its inverse and its Jacobian determinant remain tractable.
+
+If we define the intermediate variables
+$$
+h_0=z,\qquad h_k=f_k(h_{k-1}),\qquad h_K=x,
+$$
+then the density writes
+$$
+\log p_\theta(x)
+=\log \tilde p(z)-
+\sum_{k=1}^K \log \left|\det J_{f_k}(h_{k-1})\right|.
+$$
+
+This decomposition explains the name normalizing flow: the distribution progressively flows through several simple transformations, and at each step we keep track of how the density changes.
+
+We now want to understand what objective is optimized in this case. Since the model density $p_\theta$ is explicit, the natural objective is maximum likelihood. Given a dataset $\mathcal D=\{x_i\}_{i=1}^N$, we search for the transport application $T_\theta$ which maximizes
+$$
+\frac1N \sum_{i=1}^N \log p_\theta(x_i).
+$$
+Equivalently, this amounts to minimizing the Kullback-Leibler divergence between the empirical distribution and the transported model:
+$$
+\min_{T_\theta} \mathrm{KL}\big(\hat p_\text{data}\mid\mid (T_\theta)_\# \tilde p\big).
+$$
+
+This formulation makes clear that normalizing flows are also transport models. But contrary to GAN, where the transport is learnt indirectly through a neural divergence, here the transport map itself is explicitly constrained and its action on densities is known. The model is not only a generator from noise to data, it is a change of variables between two probability distributions.
+
+{{<conclusionBlock>}}
+The final objective in this case is :
+$$
+\min_{T_\theta} \mathrm{KL}\big(\hat p_\text{data}\mid\mid (T_\theta)_\# \tilde p\big)
+$$
+under the constraint that $T_\theta$ is invertible and has a tractable Jacobian determinant.
+{{</conclusionBlock>}}
+
+## Stochastic transport
+
+Instead of learning a single map $T_\theta$ that directly pushes $\tilde p$ to $p_{\text{data}}$, the stochastic viewpoint decomposes the transport into a sequence (or a continuum) of simpler stochastic transformations. This is done by introducing a family of intermediate distributions $(q_t)$ indexed either by a discrete time $k\in\mathbb{N}$ or a continuous time $t\in[0,1]$, with
 $$
 q_0 = \tilde p,
 \qquad
@@ -142,12 +219,9 @@ q_t = (\Phi_{0\to t})_\# \tilde p,
 q_1 = (\Phi_{0\to 1})_\# \tilde p \approx p_{\text{data}}.
 $$
 
-The next sections explain how such a flow can be specified and learned through ODE or SDE dynamics.
+### Define a stochastic dynamic
+We call here a stochatic dynamic an SDE that describes how a random variable $X_t \sim q_t$ evolves over time.
 
-### Define and learn a dynamic
-We call a dynamics an ODE or an SDE that describes how a random variable $X_t \sim q_t$ evolves over time.
-
-#### SDE dynamic
 Let $X_t \sim q_t$. A general SDE has the form
 $$
 dX_t \;=\; a(X_t,t)\,dt \;+\; b(X_t,t)\,dW_t,
@@ -160,15 +234,19 @@ Unlike a deterministic transport map, an SDE defines a stochastic transport. In 
 
 A common strategy is to first define a forward (noising) dynamics that transports $p_{\text{data}}$ to a simple reference distribution $\tilde p$, and then to learn or approximate the corresponding reverse transport starting from $\tilde p$.
 
+{{<conclusionBlock>}}
 We denote by $d\overrightarrow X_t$ the forward dynamics (from data to noise), and by $d\overleftarrow X_t$ the reverse dynamics (from noise to data). The general form of the forward SDE is
+
+
 $$
 d\overrightarrow X_t \;=\; a(\overrightarrow X_t,t)\,dt \;+\; b(\overrightarrow X_t,t)\,dW_t.
 $$
+{{</conclusionBlock>}}
 The reverse dynamics $d\overleftarrow X_t$ is then derived (or approximated) from the forward dynamics.
 
 This forward–reverse strategy is convenient because it is typically easy to design a forward noising process that maps $\hat p_{\text{data}}$ to a known reference distribution $\tilde p$ (often a Gaussian).
 
-##### Choose coefficients of the SDE
+### Choose coefficients of the SDE
 We choose a linear drift $a(\overrightarrow X_t,t) = -\lambda(t)\,\overrightarrow X_t$ and an isotropic diffusion $b(\overrightarrow X_t,t) = g(t)\,I$.
 
 Why do we start with these forms? As said previously, $\tilde p$ is often chosen to be Gaussian. With a linear drift and an isotropic diffusion, the conditional marginals $\{q_t(\cdot\mid X_0)\}_t$ remain Gaussian and admit closed-form expressions, fully determined by $\lambda$ and $g$.
@@ -183,17 +261,26 @@ $$
 \sigma^2(t)=\int_0^t \exp\!\Big(-2\int_s^t \lambda(u)\,du\Big)\,g(s)^2\,ds.
 $$
 
-A second question is: why do we include the minus sign in front of $\lambda(t)$? By analogy with physics, the minus sign makes the deterministic part of the dynamics stable: the drift acts as a restoring force that pulls $\overrightarrow X_t$ toward $0$. Since $\tilde p$ is typically a zero-mean distribution, we want the forward dynamics to have a deterministic component that contracts toward $0$ while noise is progressively injected.
+A second question is: why do we include the minus sign in front of $\lambda(t)$? 
+
+By analogy with physics, the minus sign makes the deterministic part of the dynamics stable: the drift acts as a restoring force that pulls $\overrightarrow X_t$ toward $0$. Since $\tilde p$ is typically a zero-mean distribution, we want the forward dynamics to have a deterministic component that contracts toward $0$ while noise is progressively injected.
+
 Once $\lambda$ and $g$ are chosen, the forward SDE defines a family of marginals $(q_t)_{t\in[0,1]}$ and therefore a transport from $p_{\text{data}}$ (in practice, from $\hat p_{\text{data}}$) to a simple reference distribution $\tilde p$ (often $\mathcal N(0,I)$). In discrete implementations, we simulate a time grid and obtain a sequence
 $$
 X_0 \sim \hat p_{\text{data}},\qquad X_{k+1} =\text{forward dynamic}(X_k),\qquad X_K \approx \tilde p,
 $$
 so that the composition of these elementary transitions yields the overall forward transport.
 
-##### Some examples of forward dynamics
+**Some examples of forward dynamics**
+
 By using the suposition on the SDE coefficients, we build some popular forward process.
-- Pure diffusion (no drift): We set the drift (determinist part) as $\lambda(t)=0$. The $\{q_t\mid X_0\}$ familly is gaussian with a variance increasing with respect to the time. Indeed, $Var(q_t \mid X_0) = \int^t_0 g(s)^2ds$. The dynamic converges to a gaussian with high variance $\sigma_\text{max}^2$.
-- VP-SDE (variance-preserving): choose $\lambda(t)$ and $g(t)$ so that the marginals remain controlled and the terminal distribution matches (or is close to) $\mathcal N(0,I)$. We often reparametrize $\lambda(t) = \frac 1 2 \beta(t)$ and $g(t) = \sqrt{\beta(t)}$ and take $\beta(t)$ as a positive function. As a consequence the law of $X_t|X_0$ converges to $\mathcal N(0,1)$. The name "variance preserving" comes from the conditional to $X_0$ variance converges to 1 and that under condition on $X_0$, variance is contant to 1.
+
+- Pure diffusion (no drift): We set the drift (determinist part) as $\lambda(t)=0$. The $\{q_t\mid X_0\}$ familly is gaussian with a variance increasing with respect to the time.  
+Indeed, $Var(q_t \mid X_0) = \int^t_0 g(s)^2ds$. The dynamic converges to a gaussian with high variance $\sigma_\text{max}^2$.
+
+- VP-SDE (variance-preserving): We reparametrize $\lambda(t) = \frac 1 2 \beta(t)$ and $g(t) = \sqrt{\beta(t)}$ and take $\beta(t)$ as a positive function.  
+As a consequence the law of $X_t|X_0$ converges to $\mathcal N(0,1)$. The name "variance preserving" comes from the conditional to $X_0$ variance converges to 1 and that under condition on $X_0$, variance is contant to 1.
+
 - Ornstein–Uhlenbeck (OU): The process is a VP-SDE but $\beta(t) = \beta$, a constant positive value.
 - DDPM (discrete time) dynamics:
 $$
@@ -203,7 +290,7 @@ To obtain this dynamic we use a discrete time grid on VP-SDE.
 
 With those forward dynamics, we build $\{q_t\}$ and with them, we transport $p_\text{data}$ - in practice we transport $\hat p_\text{data}$ - to $\tilde p$ (often $\mathcal{N}(0,1)$).
 
-##### Reverse dynamic
+### Reverse dynamic
 
 We call a reverse dynamics a dynamics that transports $\tilde p$ into $p_{\text{data}}$.
 For a forward SDE
@@ -220,6 +307,7 @@ and is simulated from $t=1$ down to $t=0$ starting from $X_1\sim\tilde p$.
 
 Here we assume that $a$, $b$, and the marginals $(q_t)_t$ satisfy the regularity and non-degeneracy conditions ensuring time-reversal of diffusions (as in Anderson (1982) and Haussmann & Pardoux (1986)).
 
+{{<conclusionBlock>}}
 In our isotropic setting $b(t,x)=g(t)I$ (so $\Sigma(t,x)=g(t)^2 I$ does not depend on $x$), the divergence term vanishes and this simplifies to
 $$
 d\overleftarrow X_t=
@@ -229,11 +317,13 @@ g(t)\,d\bar W_t,
 \qquad
 s_t(x):=\nabla_x\log q_t(x).
 $$
+{{</conclusionBlock>}}
+
 In practice, the family of scores $(s_t)_t$ is approximated by a neural network (score matching / noise prediction) and then plugged into the reverse drift.
 
 The key idea is that, once the scores are learned, we can transport $\tilde p$ to $p_{\text{data}}$.
 
-###### Some reverse dynamics
+**Some reverse dynamics**
 
 - Reverse of pure diffusion (no drift): if $a(t,x)=0$ and $b(t,x)=g(t)I$, then
 $$
@@ -269,11 +359,61 @@ $$
 \tilde\beta_k:=\beta_k\,\frac{1-\bar\alpha_{k-1}}{1-\bar\alpha_k},
 $$
 
+### Define a velocity: Fokker–Planck
 
+To keep pushing the transport viewpoint, it helps to give a name to what is actually “moving”: the probability mass itself. This is where the Fokker--Planck equation becomes really handy.
 
-###### Langevin dynamics
+An SDE defines, for fixed noise, a whole path of distributions $\{q_t\}_{t\in[0,1]}$. So, even if we do not track individual particles, we can still describe how the density flows over time. Under the usual smoothness assumptions and assuming $\overleftarrow X_t$ admits a density, we can write a PDE for $q_t$, the density of $\overleftarrow X_t$. We look at the simple isotropic case
 
-Langevin dynamics provides another way to sample from a target distribution using its score. Unlike diffusion models, it does not rely on an explicit forward noising process, but it requires (an approximation of) the score function $ \nabla_x \log p_{\text{target}}(x) $.
+$$
+a(\overleftarrow X_t,t) = -\lambda(t), \qquad b(\overleftarrow X_t,t)=g(t)\,I.
+$$
+
+{{<conclusionBlock>}}
+The corresponding Fokker--Planck equation is
+$$
+\partial_t q_t(x)=\lambda(t)\cdot\nabla q_t(x)+\frac12\,g(t)^2\,\Delta q_t(x).
+$$
+{{</conclusionBlock>}}
+
+A good way to read this equation is to rewrite it as a conservation law:
+$$
+\partial_t q_t(x) = -\nabla\cdot j_t(x),
+$$
+for some probability current $j_t$. In this setting, the current is
+$$
+j_t(x) = -\lambda(t)\,q_t(x)\;-\;\frac12\,g(t)^2\,\nabla q_t(x).
+$$
+
+This expression is nice because it splits into two effects you can almost picture:
+
+- $j_{\mathrm{drift}}(t,x) = -\lambda(t)\,q_t(x)$.  
+  This is the “bulk motion” coming from the drift. Since $\lambda(t)$ does not depend on $x$, it just pushes the whole density in the direction $-\lambda(t)$.
+
+- $j_{\mathrm{diff}}(t,x) = -\frac12\,g(t)^2\,\nabla q_t(x)$.  
+  This is diffusion: probability leaks from where $q_t$ is large toward where it is small. The larger $g(t)$ is, the more aggressively the density spreads and smooths out.
+
+{{<conclusionBlock>}}
+If we want an actual velocity field, we can divide the current by the density (wherever $q_t(x)>0$):
+$$
+v_t(x) := \frac{j_t(x)}{q_t(x)}
+= -\lambda(t) - \frac12\,g(t)^2\,\nabla\log q_t(x).
+$$
+Then Fokker--Planck becomes
+$$
+\partial_t q_t(x) = -\nabla\cdot\big(q_t(x)\,v_t(x)\big),
+$$
+{{</conclusionBlock>}}
+
+which is literally the physics continuity equation: mass is conserved, and it moves with velocity $v_t$.
+
+**Why bother with $j_t$ or $v_t$?**
+
+Because it gives a concrete object to compare. Instead of only looking at endpoints $q_0$ and $q_1$, we can look at how a model transports mass at each time. We are able to quantify the evolution of the distribution across the time.
+However, as we will see later, this equation is not merely an indication of the velocity.
+
+### Langevin dynamics
+Langevin dynamics provides another way **to sample from a target distribution using its score**. Unlike diffusion models, it does not rely on an explicit forward noising process, but it requires (an approximation of) the score function $ \nabla_x \log p_{\text{target}}(x) $.
 
 Overdamped Langevin dynamics comes from physics and describes the evolution of a system under a potential $U$, while accounting for thermal Brownian noise. It can be written as
 $$
@@ -309,50 +449,6 @@ where $ s_\theta \approx \nabla \log p_{\text{target}} $.
 However, this approach comes with several practical limitations in exploration of difficult distribution or with the ergodicity hypothesis. This part is not discussed in this article.
 
 These issues motivate variants such as MALA (Metropolis-adjusted Langevin), preconditioning, or annealed/tempered Langevin schemes to improve robustness and exploration.
-
-##### Define a velocity: Fokker–Planck
-
-To keep pushing the transport viewpoint, it helps to give a name to what is actually “moving”: the probability mass itself. This is where the Fokker--Planck equation becomes really handy.
-
-An SDE defines a whole path of distributions $\{q_t\}_{t\in[0,1]}$. So, even if we do not track individual particles, we can still describe how the density flows over time. Under the usual smoothness assumptions and assuming $\overleftarrow X_t$ admits a density, we can write a PDE for $q_t$, the density of $\overleftarrow X_t$. We look at the simple isotropic case
-$$
-a(\overleftarrow X_t,t) = -\lambda(t), \qquad b(\overleftarrow X_t,t)=g(t)\,I.
-$$
-The corresponding Fokker--Planck equation is
-$$
-\partial_t q_t(x)=\lambda(t)\cdot\nabla q_t(x)+\frac12\,g(t)^2\,\Delta q_t(x).
-$$
-
-A good way to read this equation is to rewrite it as a conservation law:
-$$
-\partial_t q_t(x) = -\nabla\cdot j_t(x),
-$$
-for some probability current $j_t$. In this setting, the current is
-$$
-j_t(x) = -\lambda(t)\,q_t(x)\;-\;\frac12\,g(t)^2\,\nabla q_t(x).
-$$
-
-This expression is nice because it splits into two effects you can almost picture:
-
-- $j_{\mathrm{drift}}(t,x) = -\lambda(t)\,q_t(x)$.  
-  This is the “bulk motion” coming from the drift. Since $\lambda(t)$ does not depend on $x$, it just pushes the whole density in the direction $-\lambda(t)$.
-
-- $j_{\mathrm{diff}}(t,x) = -\frac12\,g(t)^2\,\nabla q_t(x)$.  
-  This is diffusion: probability leaks from where $q_t$ is large toward where it is small. The larger $g(t)$ is, the more aggressively the density spreads and smooths out.
-
-If we want an actual velocity field, we can divide the current by the density (wherever $q_t(x)>0$):
-$$
-v_t(x) := \frac{j_t(x)}{q_t(x)}
-= -\lambda(t) - \frac12\,g(t)^2\,\nabla\log q_t(x).
-$$
-Then Fokker--Planck becomes
-$$
-\partial_t q_t(x) = -\nabla\cdot\big(q_t(x)\,v_t(x)\big),
-$$
-which is literally the physics continuity equation: mass is conserved, and it moves with velocity $v_t$.
-
-Why bother with $j_t$ or $v_t$? Because it gives a concrete object to compare. Instead of only looking at endpoints $q_0$ and $q_1$, we can look at how a model transports mass at each time. That is exactly the kind of thing we will need later when we want to talk about “how close” a given generative transport is to an optimal one.
-
 
 
 
